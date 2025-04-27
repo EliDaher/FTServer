@@ -1,5 +1,5 @@
 const { ref, set, get } = require("firebase/database");
-const { database } = require('./firebaseConfig.js');
+const { database } = require('../firebaseConfig.js');
 
 // Sign Up
 const SignUp = async (req, res) => {

@@ -1,5 +1,5 @@
 const { ref, set, get } = require("firebase/database");
-const { database } = require('./firebaseConfig.js');
+const { database } = require('../firebaseConfig.js');
 
 // add weight
 const addWeight = async (req, res) => {
