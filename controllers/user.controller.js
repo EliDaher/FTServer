@@ -1,4 +1,4 @@
-const { ref, set, get } = require("firebase/database");
+const { ref, update, get } = require("firebase/database");
 const { database } = require('../firebaseConfig.js');
 
 // add weight
