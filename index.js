@@ -1,12 +1,12 @@
 const express = require('express');
 const { google } = require('googleapis');
 const cors = require('cors');
-const { ref, get, child, query, orderByChild, equalTo, push, set, limitToLast } = require("firebase/database");
-const { database } = require('./firebaseConfig.js');
 const http = require('http');
 require('dotenv').config(); // تحميل متغيرات البيئة
 const { Server } = require("socket.io");
 const cron = require("node-cron");
+const { Login, SignUp } = require('./controllers/auth.controller')
+const { addWeight } = require('./controllers/user.controller')
 
 
 
@@ -41,34 +41,11 @@ app.use(express.json()); // لمعالجة بيانات JSON في الطلبات
 
 
 
-app.post("/SignUp", async (req, res) => {
-    try {
-        const { email, password, username, fullname } = req.body;
+app.post("/SignUp", SignUp);  
 
+app.post("/login", Login);  
 
-        console.log(email + "  //  "+ password + "  //  " + username + "  //  " + fullname)
-        console.log("done")
-      
-        const date = new Date().toISOString().split("T")[0];
-        const InvoiceRef = ref(database, `users/${username}`);
-        const newInvoiceRef = push(InvoiceRef);
-
-        await set(newInvoiceRef, {
-            fullname,
-            username,
-            password,
-            email,
-        });    
-
-        await calcTotalFund(true);
-
-        console.log('added')
-
-        res.status(200).json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: error.message });  
-    }  
-});    
+app.post("/addWeight", addWeight);    
 
 
 
