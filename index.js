@@ -41,7 +41,7 @@ app.use(express.json()); // لمعالجة بيانات JSON في الطلبات
 
 
 
-app.post("/", async (req, res) => {
+app.get("/", async (req, res) => {
     try {
         //const { email, password, username, fullname } = req.body;
 
