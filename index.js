@@ -41,21 +41,23 @@ app.use(express.json()); // لمعالجة بيانات JSON في الطلبات
 
 
 
-app.get("/", async (req, res) => {
+app.post("/SignUp", async (req, res) => {
     try {
-        //const { email, password, username, fullname } = req.body;
+        const { email, password, username, fullname } = req.body;
 
+
+        console.log(email + "  //  "+ password + "  //  " + username + "  //  " + fullname)
         console.log("done")
       
         const date = new Date().toISOString().split("T")[0];
-        const InvoiceRef = ref(database, `users/Eli`);
+        const InvoiceRef = ref(database, `users/${username}`);
         const newInvoiceRef = push(InvoiceRef);
 
         await set(newInvoiceRef, {
-            'fullname': 'eli',
-            'username': 'Eli',
-            'password': 'Kd2011ed',
-            'email': 'eeli56315',
+            fullname,
+            username,
+            password,
+            email,
         });    
 
         await calcTotalFund(true);
