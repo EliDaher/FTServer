@@ -6,7 +6,7 @@ require('dotenv').config(); // تحميل متغيرات البيئة
 const { Server } = require("socket.io");
 const cron = require("node-cron");
 const { Login, SignUp } = require('./controllers/auth.controller')
-const { addWeight } = require('./controllers/user.controller')
+const { addWeight, addHeight, addGender } = require('./controllers/user.controller')
 
 
 
@@ -45,7 +45,11 @@ app.post("/SignUp", SignUp);
 
 app.post("/login", Login);  
 
-app.post("/addWeight", addWeight);    
+app.post("/addWeight", addWeight);  
+
+app.post("/addHeight", addHeight); 
+
+app.post("/addGender", addGender);    
 
 
 
