@@ -40,9 +40,9 @@ app.use(express.json()); // لمعالجة بيانات JSON في الطلبات
 
 
 
-app.post("/", (req, res) => {
-    res.send("تم استقبال الطلب بنجاح!");
-}); 
+app.get("/", (req, res) => {
+    res.send("Server is alive!");
+});
 
 app.post("/SignUp", SignUp);  
 
