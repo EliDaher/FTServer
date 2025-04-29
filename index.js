@@ -40,6 +40,9 @@ app.use(express.json()); // لمعالجة بيانات JSON في الطلبات
 
 
 
+app.post("/", (req, res) => {
+    res.send("تم استقبال الطلب بنجاح!");
+}); 
 
 app.post("/SignUp", SignUp);  
 
