@@ -7,6 +7,7 @@ const { Server } = require("socket.io");
 const cron = require("node-cron");
 const { Login, SignUp } = require('./controllers/auth.controller')
 const { addWeight, addHeight, addGender } = require('./controllers/user.controller')
+const { createExercise } = require('./controllers/exercise.controller');
 
 
 
@@ -54,7 +55,11 @@ app.post("/addHeight", addHeight);
 
 app.post("/addGender", addGender);    
 
+// تقديم الصور
+app.use('/assets', express.static('assets'));
 
+// نقطة الإدخال
+app.post('/api/exercises', createExercise);
 
 
 
