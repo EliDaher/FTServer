@@ -2,6 +2,10 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 
+const { ref, update, get } = require("firebase/database");
+const { database } = require('../firebaseConfig.js')
+
+
 // 1. إعداد مجلد الحفظ
 const uploadDir = path.join(__dirname, '..', 'assets', 'exerciseImages');
 if (!fs.existsSync(uploadDir)) {
@@ -24,7 +28,7 @@ const upload = multer({ storage });
 
 // 3. دالة المعالجة
 const createExercise = async (req, res) => {
-    upload.single('imageFile')(req, res, function (err) {
+    upload.single('imageFile')(req, res, async function (err) {
         if (err instanceof multer.MulterError) {
             return res.status(400).json({ error: 'Multer error', details: err.message });
         } else if (err) {
@@ -46,7 +50,25 @@ const createExercise = async (req, res) => {
 
         const imageUrl = `/assets/exerciseImages/${req.file.filename}`;
 
-        // هنا يمكنك حفظ التمرين في قاعدة بيانات
+        // حفظ التمرين في قاعدة بيانات
+
+        const ExerciseRef = ref(database, `exercise/${exerciseName}`);
+        const snapshot = await get(ExerciseRef);
+
+        if (snapshot.exists()) {
+            return res.status(400).json({ error: "Exercise already exists." });
+        }
+
+        await set(ExerciseRef, {
+            exerciseName,
+            category,
+            bodyPart,
+            difficulty,
+            description,
+            commonMistakes,
+            imageUrl
+        });
+
         console.log('تم استلام التمرين:', {
             exerciseName,
             category,
