@@ -1,32 +1,29 @@
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
-
 const { ref, set, get } = require("firebase/database");
-const { database } = require('../firebaseConfig.js')
+const { database } = require('../firebaseConfig.js');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
+// إعداد Cloudinary
+cloudinary.config({
+    cloud_name: 'dbz4tyulh',      // استبدلها بـ اسم حسابك في Cloudinary
+    api_key: '931519516189279',       // API Key من Cloudinary
+    api_secret: '5lRhswZI92JB_NbY7Lq0AbcN32w'       // API Secret من Cloudinary
+});
 
-// 1. إعداد مجلد الحفظ
-const uploadDir = path.join(__dirname, '..', 'assets', 'exerciseImages');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// 2. إعداد multer داخليًا
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
+// إعداد multer مع Cloudinary
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'exerciseImages',
+        allowed_formats: ['jpg', 'jpeg', 'png'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }],
     },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-    }
 });
 
 const upload = multer({ storage });
 
-// 3. دالة المعالجة
+// دالة إنشاء تمرين
 const createExercise = async (req, res) => {
     upload.single('imageFile')(req, res, async function (err) {
         if (err instanceof multer.MulterError) {
@@ -44,14 +41,13 @@ const createExercise = async (req, res) => {
             commonMistakes
         } = req.body;
 
-        if (!req.file) {
+        if (!req.file || !req.file.path) {
             return res.status(400).json({ error: 'Image file is required.' });
         }
 
-        const imageUrl = `/assets/exerciseImages/${req.file.filename}`;
+        const imageUrl = req.file.path; // رابط Cloudinary النهائي
 
-        // حفظ التمرين في قاعدة بيانات
-
+        // التحقق من وجود التمرين
         const ExerciseRef = ref(database, `exercise/${exerciseName}`);
         const snapshot = await get(ExerciseRef);
 
@@ -59,6 +55,7 @@ const createExercise = async (req, res) => {
             return res.status(400).json({ error: "Exercise already exists." });
         }
 
+        // الحفظ في قاعدة البيانات
         await set(ExerciseRef, {
             exerciseName,
             category,
@@ -94,9 +91,8 @@ const createExercise = async (req, res) => {
     });
 };
 
-
+// دالة جلب كل التمارين
 const getAllExercises = async (req, res) => {
-
     const exerciseRef = ref(database, `exercise`);
     const snapshot = await get(exerciseRef);
 
@@ -105,10 +101,8 @@ const getAllExercises = async (req, res) => {
     }
 
     const exerciseData = snapshot.val();
-
     return res.status(200).json({ success: true, exercises: exerciseData });
-
-}
+};
 
 module.exports = {
     createExercise,
