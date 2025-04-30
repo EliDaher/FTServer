@@ -7,7 +7,7 @@ const { Server } = require("socket.io");
 const cron = require("node-cron");
 const { Login, SignUp } = require('./controllers/auth.controller')
 const { addWeight, addHeight, addGender } = require('./controllers/user.controller')
-const { createExercise } = require('./controllers/exercise.controller');
+const { createExercise, getAllExercises } = require('./controllers/exercise.controller');
 
 
 
@@ -60,6 +60,9 @@ app.use('/assets', express.static('assets'));
 
 // نقطة الإدخال
 app.post('/api/exercises', createExercise);
+
+// اعادة كل التمارين
+app.post('/getAllExercises', getAllExercises);
 
 
 

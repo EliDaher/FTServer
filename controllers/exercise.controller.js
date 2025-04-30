@@ -94,6 +94,23 @@ const createExercise = async (req, res) => {
     });
 };
 
+
+const getAllExercises = async (req, res) => {
+
+    const exerciseRef = ref(database, `exercise`);
+    const snapshot = await get(exerciseRef);
+
+    if (!snapshot.exists()) {
+        return res.status(404).json({ error: "exercises not found." });
+    }
+
+    const exerciseData = snapshot.val();
+
+    return res.status(200).json({ success: true, exercises: exerciseData });
+
+}
+
 module.exports = {
-    createExercise
+    createExercise,
+    getAllExercises
 };
