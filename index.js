@@ -7,7 +7,7 @@ const { Server } = require("socket.io");
 const cron = require("node-cron");
 const { Login, SignUp } = require('./controllers/auth.controller')
 const { addWeight, addHeight, addGender } = require('./controllers/user.controller')
-const { createExercise, getAllExercises } = require('./controllers/exercise.controller');
+const { createExercise, getAllExercises, getExerciseByName } = require('./controllers/exercise.controller');
 
 
 
