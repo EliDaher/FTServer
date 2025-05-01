@@ -107,18 +107,19 @@ const getAllExercises = async (req, res) => {
 
 
 // جلب تمرين حسب اسم التمرين
+// GET /exercise?name=pushup
 const getExerciseByName = async (req, res) => {
+    const { name } = req.query;
 
-    
-    const {
-        exerciseName,
-    } = req.body;
+    if (!name) {
+        return res.status(400).json({ error: "Missing exercise name" });
+    }
 
-    const exerciseRef = ref(database, `exercise/${exerciseName}`);
+    const exerciseRef = ref(database, `exercise/${name}`);
     const snapshot = await get(exerciseRef);
 
     if (!snapshot.exists()) {
-        return res.status(404).json({ error: "exercise not found." });
+        return res.status(404).json({ error: "Exercise not found." });
     }
 
     const exerciseData = snapshot.val();
