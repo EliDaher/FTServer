@@ -64,6 +64,9 @@ app.post('/api/exercises', createExercise);
 // اعادة كل التمارين
 app.post('/getAllExercises', getAllExercises);
 
+// اعادة تمرين حسب اسمه
+app.get('/getExerciseByName', getExerciseByName);
+
 
 
 

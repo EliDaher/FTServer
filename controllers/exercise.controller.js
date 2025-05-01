@@ -91,6 +91,7 @@ const createExercise = async (req, res) => {
     });
 };
 
+
 // دالة جلب كل التمارين
 const getAllExercises = async (req, res) => {
     const exerciseRef = ref(database, `exercise`);
@@ -104,7 +105,28 @@ const getAllExercises = async (req, res) => {
     return res.status(200).json({ success: true, exercises: exerciseData });
 };
 
+
+// جلب تمرين حسب اسم التمرين
+const getExerciseByName = async (req, res) => {
+
+    
+    const {
+        exerciseName,
+    } = req.body;
+
+    const exerciseRef = ref(database, `exercise/${exerciseName}`);
+    const snapshot = await get(exerciseRef);
+
+    if (!snapshot.exists()) {
+        return res.status(404).json({ error: "exercise not found." });
+    }
+
+    const exerciseData = snapshot.val();
+    return res.status(200).json({ success: true, exercise: exerciseData });
+};
+
 module.exports = {
     createExercise,
-    getAllExercises
+    getAllExercises,
+    getExerciseByName
 };
