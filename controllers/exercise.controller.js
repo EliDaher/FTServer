@@ -16,8 +16,10 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'exerciseImages',
-        allowed_formats: ['jpg', 'jpeg', 'png'],
-        transformation: [{ width: 500, height: 500, crop: 'limit' }],
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+        transformation: [
+            { width: 500, height: 500, crop: 'limit', flags: 'animated' } // لدعم gif المتحركة
+        ],
     },
 });
 
@@ -102,7 +104,7 @@ const getAllExercises = async (req, res) => {
     }
 
     const exerciseData = snapshot.val();
-    return res.status(200).json({ success: true, exercises: exerciseData });
+    return res.status(200).json({ exercises: exerciseData });
 };
 
 
@@ -123,7 +125,7 @@ const getExerciseByName = async (req, res) => {
     }
 
     const exerciseData = snapshot.val();
-    return res.status(200).json({ success: true, exercise: exerciseData });
+    return res.status(200).json({ exercise: exerciseData });
 };
 
 module.exports = {
