@@ -67,6 +67,8 @@ app.post('/getAllExercises', getAllExercises);
 // اعادة تمرين حسب اسمه
 app.get('/getExerciseByName', getExerciseByName);
 
+// اعادة بيانات المشترك
+app.post('/getUserData', getUserData);
 
 
 

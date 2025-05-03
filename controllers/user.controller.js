@@ -81,4 +81,28 @@ const addWeight = async (req, res) => {
     }
 };
 
-module.exports = { addWeight, addHeight, addGender };
+// get user data
+const getUserData = async (req, res) => {
+    try {
+        const { username } = req.body;
+
+        if (!username) {
+            return res.status(400).json({ error: "username is required." });
+        }
+
+        const UserRef = ref(database, `users/${username}`);
+        const snapshot = await get(UserRef);
+
+        if (!snapshot.exists()) {
+            return res.status(400).json({ error: "Username Didn't exists." });
+        }
+
+        const userData = snapshot.val();
+
+        return res.status(200).json({ success: true, userData: userData });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = { addWeight, addHeight, addGender, getUserData };
