@@ -6,7 +6,7 @@ require('dotenv').config(); // تحميل متغيرات البيئة
 const { Server } = require("socket.io");
 const cron = require("node-cron");
 const { Login, SignUp } = require('./controllers/auth.controller')
-const { addWeight, addHeight, addGender } = require('./controllers/user.controller')
+const { addWeight, addHeight, addGender, getUserData } = require('./controllers/user.controller')
 const { createExercise, getAllExercises, getExerciseByName } = require('./controllers/exercise.controller');
 
 
