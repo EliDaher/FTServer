@@ -7,7 +7,7 @@ const { Server } = require("socket.io");
 const cron = require("node-cron");
 const { Login, SignUp } = require('./controllers/auth.controller')
 const { addWeight, addHeight, addGender, getUserData, updatePersonalDetails } = require('./controllers/user.controller')
-const { createExercise, getAllExercises, getExerciseByName } = require('./controllers/exercise.controller');
+const { createExercise, getAllExercises, getExerciseByName, updateExercise } = require('./controllers/exercise.controller');
 
 
 
@@ -72,6 +72,12 @@ app.post('/getUserData', getUserData);
 
 // تحديث بيانات المستخدم
 app.post('/updatePersonalDetails', updatePersonalDetails);
+
+// تعديل التمرين
+app.post('/updateExercise', updateExercise);
+
+// حذف التمرين
+app.post('/deleteExercise', deleteExercise);
 
 
 

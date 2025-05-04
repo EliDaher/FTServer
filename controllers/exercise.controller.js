@@ -1,4 +1,4 @@
-const { ref, set, get } = require("firebase/database");
+const { ref, set, get, update, remove } = require("firebase/database");
 const { database } = require('../firebaseConfig.js');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -128,8 +128,58 @@ const getExerciseByName = async (req, res) => {
     return res.status(200).json({ exercise: exerciseData });
 };
 
+const updateExercise = async (req, res) => {
+
+    try {
+        const { editedData, name } = req.body;
+
+        if ( !editedData ) {
+            return res.status(400).json({ error: "All fields are required." });
+        }
+
+        const UserRef = ref(database, `exercise/${name}`);
+        const snapshot = await get(UserRef);
+
+        if (!snapshot.exists()) {
+            return res.status(400).json({ error: "Exercise Didn't exists." });
+        }
+
+        await update(UserRef, editedData);
+
+        return res.status(200).json({ success: true, message: "Data Updated Successfully." });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+
+}
+
+const deleteExercise = async (req, res) => {
+    try {
+      const { name } = req.body;
+  
+      if (!name) {
+        return res.status(400).json({ error: "Exercise name is required." });
+      }
+  
+      const exerciseRef = ref(database, `exercise/${name}`);
+      const snapshot = await get(exerciseRef);
+  
+      if (!snapshot.exists()) {
+        return res.status(404).json({ error: "Exercise does not exist." });
+      }
+  
+      await remove(exerciseRef);
+  
+      return res.status(200).json({ success: true, message: "Exercise deleted successfully." });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+};
+  
 module.exports = {
     createExercise,
     getAllExercises,
-    getExerciseByName
+    getExerciseByName,
+    updateExercise,
+    deleteExercise,
 };
