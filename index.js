@@ -8,6 +8,13 @@ const cron = require("node-cron");
 const { Login, SignUp } = require('./controllers/auth.controller')
 const { addWeight, addHeight, addGender, getUserData, updatePersonalDetails } = require('./controllers/user.controller')
 const { createExercise, getAllExercises, getExerciseByName, updateExercise, deleteExercise } = require('./controllers/exercise.controller');
+const {
+    addWorkOut,
+    getWorkOut,
+    updateWorkOut,
+    getAllWorkOuts,
+    
+} = require('./controllers/workOut.controller')
 
 
 
@@ -78,6 +85,18 @@ app.post('/updateExercise', updateExercise);
 
 // حذف التمرين
 app.post('/deleteExercise', deleteExercise);
+
+// اضافة برنامج تدريبي
+app.post("/addWorkOut", addWorkOut);
+
+// اعادة كل التمارين
+app.post("/getAllWorkOuts", getAllWorkOuts);
+
+// اعادة برنامج تدريبي محدد
+app.get("/workout/:id", getWorkOut);
+
+// تعديل برنامج رياضي
+app.put("/workout/:id", updateWorkOut);
 
 
 
