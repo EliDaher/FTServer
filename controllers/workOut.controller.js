@@ -1,50 +1,56 @@
-const { ref, set, get } = require("firebase/database");
+const { ref, set, get, update } = require("firebase/database");
 const { database } = require('../firebaseConfig.js');
-const { v4: uuidv4 } = require('uuid');
 
-// addWorkOut controller
+// Add Workout
 const addWorkOut = async (req, res) => {
   try {
     const { newWorkOut } = req.body;
 
-    if (!newWorkOut || !newWorkOut.title) {
-      return res.status(400).json({ error: "Workout data and title are required." });
+    if (!newWorkOut || !newWorkOut.id || !newWorkOut.title) {
+      return res.status(400).json({ error: "Workout data, id, and title are required." });
     }
 
-    const workoutId = workOutRef.id; 
+    const workoutId = newWorkOut.id;
     const workOutRef = ref(database, `workOuts/${workoutId}`);
+    const snapshot = await get(workOutRef);
+
+    if (snapshot.exists()) {
+      return res.status(400).json({ error: "Workout with this ID already exists." });
+    }
 
     const workoutData = {
       ...newWorkOut,
-      id: workoutId,
-      createdAt: new Date().toISOString()
+      createdAt: newWorkOut.createdAt || new Date().toISOString(),
     };
 
     await set(workOutRef, workoutData);
-
     return res.status(200).json({ success: true, message: "Workout added successfully.", id: workoutId });
+
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
 
-// Get All WorkOuts
+// Get All Workouts
 const getAllWorkOuts = async (req, res) => {
   try {
     const workOutRef = ref(database, `workOuts`);
     const snapshot = await get(workOutRef);
 
     if (!snapshot.exists()) {
-      return res.status(404).json({ error: "Workout not found." });
+      return res.status(404).json({ error: "No workouts found." });
     }
 
-    return res.status(200).json({ success: true, workOuts: snapshot.val() });
+    const data = snapshot.val();
+    const workoutsArray = Object.values(data);
+
+    return res.status(200).json({ success: true, workOuts: workoutsArray });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
 
-// Get WorkOut by ID
+// Get Workout by ID
 const getWorkOut = async (req, res) => {
   try {
     const { id } = req.params;
@@ -66,7 +72,7 @@ const getWorkOut = async (req, res) => {
   }
 };
 
-// Update WorkOut by ID
+// Update Workout
 const updateWorkOut = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,9 +91,9 @@ const updateWorkOut = async (req, res) => {
   }
 };
 
-module.exports = { 
+module.exports = {
   addWorkOut,
+  getAllWorkOuts,
   getWorkOut,
   updateWorkOut,
-  getAllWorkOuts,
 };
