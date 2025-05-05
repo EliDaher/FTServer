@@ -27,7 +27,7 @@ const server = http.createServer(app); // Create HTTP server
 const io = new Server(server, {
     cors: {
         origin: '*',
-        methods: ['GET', 'POST'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true
     }
@@ -37,7 +37,7 @@ const io = new Server(server, {
 // السماح بالوصول من الشبكة المحلية
 app.use(cors({
     origin: '*',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
