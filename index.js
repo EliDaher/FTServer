@@ -6,8 +6,9 @@ require('dotenv').config(); // تحميل متغيرات البيئة
 const { Server } = require("socket.io");
 const cron = require("node-cron");
 const { Login, SignUp } = require('./controllers/auth.controller')
-const { addWeight, addHeight, addGender, getUserData, updatePersonalDetails } = require('./controllers/user.controller')
+const { getAllUsers, addWeight, addHeight, addGender, getUserData, updatePersonalDetails } = require('./controllers/user.controller')
 const { createExercise, getAllExercises, getExerciseByName, updateExercise, deleteExercise } = require('./controllers/exercise.controller');
+
 const {
     addWorkOut,
     getWorkOut,
@@ -61,6 +62,10 @@ app.post("/addWeight", addWeight);
 app.post("/addHeight", addHeight); 
 
 app.post("/addGender", addGender);    
+
+
+//اعادة كل المستخدمين
+app.get(`/getAllUsers`, getAllUsers)
 
 // تقديم الصور
 app.use('/assets', express.static('assets'));

@@ -136,4 +136,26 @@ const getUserData = async (req, res) => {
     }
 };
 
-module.exports = { addWeight, addHeight, addGender, getUserData, updatePersonalDetails };
+//get all users
+const getAllUsers = async (req, res) => {
+    try {
+        const UserRef = ref(database, `users`);
+        const snapshot = await get(UserRef);
+
+        const usersData = snapshot.val();
+
+        return res.status(200).json({ usersData: usersData });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = { 
+    addWeight, 
+    addHeight, 
+    addGender, 
+    getUserData, 
+    updatePersonalDetails,
+    getAllUsers,
+    
+};

@@ -1,4 +1,4 @@
-const { ref, set, get, update } = require("firebase/database");
+const { ref, set, get, update, remove } = require("firebase/database");
 const { database } = require('../firebaseConfig.js');
 
 // Add Workout
@@ -86,6 +86,24 @@ const updateWorkOut = async (req, res) => {
     await update(workOutRef, updatedWorkOut);
 
     return res.status(200).json({ success: true, message: "Workout updated successfully." });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete Workout
+const deleteWorkOut = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: "Workout ID is required." });
+    }
+
+    const workOutRef = ref(database, `workOuts/${id}`);
+    await remove(workOutRef);
+
+    return res.status(200).json({ success: true, message: "Workout deleted successfully." });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
