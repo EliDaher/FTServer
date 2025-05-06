@@ -150,6 +150,26 @@ const getAllUsers = async (req, res) => {
     }
 }
 
+const modifyUserWorkout = async (req, res) => {
+
+    try {
+      const { updatedWorkout, username } = req.body;
+  
+      if ( !username || !updatedWorkout ) {
+        return res.status(400).json({ error: "Workout ID and update data are required." });
+      }
+  
+      const workoutRef = ref(database, `users/${username}/workouts`);
+      await update(workoutRef, updatedWorkout);
+  
+      return res.status(200).json({ success: true, message: "Workout updated successfully." });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  
+}
+
+
 module.exports = { 
     addWeight, 
     addHeight, 
@@ -157,5 +177,6 @@ module.exports = {
     getUserData, 
     updatePersonalDetails,
     getAllUsers,
+    modifyUserWorkout,
     
 };

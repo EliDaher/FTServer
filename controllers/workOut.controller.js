@@ -114,4 +114,5 @@ module.exports = {
   getAllWorkOuts,
   getWorkOut,
   updateWorkOut,
+  deleteWorkOut,
 };
