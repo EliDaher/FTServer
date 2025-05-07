@@ -1,4 +1,4 @@
-const { ref, update, get } = require("firebase/database");
+const { ref, update, get, set } = require("firebase/database");
 const { database } = require('../firebaseConfig.js')
 
 
@@ -160,7 +160,7 @@ const modifyUserWorkout = async (req, res) => {
       }
   
       const workoutRef = ref(database, `users/${username}/workouts`);
-      await update(workoutRef, updatedWorkout);
+      await set(workoutRef, updatedWorkout);
   
       return res.status(200).json({ success: true, message: "Workout updated successfully." });
     } catch (error) {
