@@ -200,5 +200,6 @@ module.exports = {
     updatePersonalDetails,
     getAllUsers,
     modifyUserWorkout,
+    getUserWorkout,
     
 };

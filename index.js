@@ -13,7 +13,8 @@ const {
     addGender, 
     getUserData, 
     updatePersonalDetails,
-    modifyUserWorkout
+    modifyUserWorkout,
+    getUserWorkout
 } = require('./controllers/user.controller')
 
 const { createExercise, 
@@ -120,7 +121,8 @@ app.put("/workout/:id", updateWorkOut);
 // تعديل البرنامج التدريبي للمستخدم
 app.post("/modifyUserWorkout", modifyUserWorkout);
 
-
+// جلب تمارين المستخدم
+app.get("getUserWorkout", getUserWorkout)
 
 
 const PORT = process.env.PORT || 1337;
