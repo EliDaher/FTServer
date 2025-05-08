@@ -122,7 +122,7 @@ app.put("/workout/:id", updateWorkOut);
 app.post("/modifyUserWorkout", modifyUserWorkout);
 
 // جلب تمارين المستخدم
-app.get("getUserWorkout", getUserWorkout)
+app.post("getUserWorkout", getUserWorkout)
 
 
 const PORT = process.env.PORT || 1337;
