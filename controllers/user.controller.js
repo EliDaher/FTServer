@@ -170,6 +170,28 @@ const modifyUserWorkout = async (req, res) => {
 }
 
 
+const getUserWorkout = async (req, res) => {
+
+    try {
+      const { username } = req.body;
+  
+      if ( !username ) {
+        return res.status(400).json({ error: "Username is required." });
+      }
+  
+      const workoutRef = ref(database, `users/${username}/workouts`);
+      const snapshot = await get(workoutRef);
+
+      const workoutData = snapshot.val()
+  
+      return res.status(200).json({ success: true, workout: workoutData });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  
+}
+
+
 module.exports = { 
     addWeight, 
     addHeight, 
