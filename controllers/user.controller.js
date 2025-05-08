@@ -233,8 +233,9 @@ const getUserWorkout = async (req, res) => {
         const workoutId = todayWorkout.id
         const todayWorkoutRef = ref(database, `workOuts/${workoutId}`);
         const resSnapshot = await get(todayWorkoutRef) 
+        const finalWorkout = resSnapshot.val();
       
-        return res.status(200).json({ success: true, workout: resSnapshot });
+        return res.status(200).json({ success: true, workout: finalWorkout });
   
     } catch (error) {
         return res.status(500).json({ error: error.message });
