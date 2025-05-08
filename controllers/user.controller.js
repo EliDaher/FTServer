@@ -151,14 +151,34 @@ const getAllUsers = async (req, res) => {
 }
 
 const modifyUserWorkout = async (req, res) => {
-
     try {
       const { updatedWorkout, username } = req.body;
   
-      if ( !username || !updatedWorkout ) {
-        return res.status(400).json({ error: "Workout ID and update data are required." });
+      if (!username || !updatedWorkout) {
+        return res.status(400).json({ error: "Username and update data are required." });
       }
   
+      const userRef = ref(database, `users/${username}`);
+      const snapshot = await get(userRef);
+  
+      // التأكد من وجود بيانات المستخدم
+      if (!snapshot.exists()) {
+        return res.status(404).json({ error: "User not found." });
+      }
+  
+      const userData = snapshot.val();
+      const today = new Date().toISOString().slice(0, 10); // تاريخ اليوم بصيغة yyyy-mm-dd
+  
+      // التأكد من وجود lastWorkoutIndex و lastWorkoutDate
+      if (userData.lastWorkoutIndex === undefined || userData.lastWorkoutDate === undefined) {
+        // إذا لم تكن موجودة، قم بتعيين القيم الافتراضية
+        await update(userRef, {
+          lastWorkoutIndex: 0,      // التمرين الأول
+          lastWorkoutDate: today,   // تاريخ اليوم
+        });
+      }
+  
+      // تحديث التمرين
       const workoutRef = ref(database, `users/${username}/workouts`);
       await set(workoutRef, updatedWorkout);
   
@@ -166,30 +186,110 @@ const modifyUserWorkout = async (req, res) => {
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
+  };
   
-}
 
 
 const getUserWorkout = async (req, res) => {
-
     try {
-      const { username } = req.body;
+        const { username } = req.body;
+        
+        if (!username) {
+          return res.status(400).json({ error: "Username is required." });
+        }
+      
+        // مراجع المسارات في قاعدة البيانات
+        const userRef = ref(database, `users/${username}`);
+        const snapshot = await get(userRef);
+      
+        if (!snapshot.exists()) {
+          return res.status(404).json({ error: "User not found." });
+        }
+      
+        const userData = snapshot.val();
+        const workouts = userData.workouts || [];
+      
+        if (workouts.length === 0) {
+          return res.status(200).json({ success: true, workout: null, message: "No workouts found." });
+        }
+      
+        const lastIndex = userData.lastWorkoutIndex ?? -1;
+        const lastDate = userData.lastWorkoutDate ?? "";
+        const today = new Date().toISOString().slice(0, 10);
+      
+        let newIndex = lastIndex;
+      
+        if (lastDate !== today) {
+          newIndex = (lastIndex + 1) % workouts.length;
+        
+          // تحديث التاريخ والمؤشر في قاعدة البيانات
+          await update(ref(database, `users/${username}`), {
+            lastWorkoutIndex: newIndex,
+            lastWorkoutDate: today
+          });
+        }
+      
+        const todayWorkout = workouts[newIndex];
+      
+        return res.status(200).json({ success: true, workout: todayWorkout });
   
-      if ( !username ) {
-        return res.status(400).json({ error: "Username is required." });
-      }
-  
-      const workoutRef = ref(database, `users/${username}/workouts`);
-      const snapshot = await get(workoutRef);
-
-      const workoutData = snapshot.val()
-  
-      return res.status(200).json({ success: true, workout: workoutData });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
+};
+
+const skipOrStartNewWorkout = async (req, res) => {
+    try {
+        const { username } = req.body;
+        
+        if (!username) {
+          return res.status(400).json({ error: "Username is required." });
+        }
+      
+        const userRef = ref(database, `users/${username}`);
+        const snapshot = await get(userRef);
+      
+        if (!snapshot.exists()) {
+          return res.status(404).json({ error: "User not found." });
+        }
+      
+        const userData = snapshot.val();
+        const workouts = userData.workouts || [];
+      
+        if (workouts.length === 0) {
+          return res.status(200).json({ success: true, message: "No workouts found." });
+        }
+      
+        const currentIndex = userData.lastWorkoutIndex ?? -1;
+        const newIndex = (currentIndex + 1) % workouts.length;
+        const today = new Date().toISOString().slice(0, 10);
+      
+        const newWorkout = workouts[newIndex];
+      
+        // (اختياري) سجل التمرين أو التخطي
+       /* const historyEntry = {
+          date: today,
+          action: "skipped or started",
+          workout: newWorkout,
+        };*/
+      
+        // تحديث البيانات
+        await update(userRef, {
+          lastWorkoutIndex: newIndex,
+          lastWorkoutDate: today,
+        });
+      
+        // إضافة إلى السجل (إن أردت)
+      /*  const historyRef = ref(database, `users/${username}/history`);
+        await push(historyRef, historyEntry);*/
+      
+        return res.status(200).json({ success: true, workout: newWorkout });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
   
-}
+  
 
 
 module.exports = { 
@@ -201,5 +301,6 @@ module.exports = {
     getAllUsers,
     modifyUserWorkout,
     getUserWorkout,
+    skipOrStartNewWorkout
     
 };

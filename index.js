@@ -14,7 +14,8 @@ const {
     getUserData, 
     updatePersonalDetails,
     modifyUserWorkout,
-    getUserWorkout
+    getUserWorkout,
+    skipOrStartNewWorkout
 } = require('./controllers/user.controller')
 
 const { createExercise, 
@@ -123,6 +124,9 @@ app.post("/modifyUserWorkout", modifyUserWorkout);
 
 // جلب تمارين المستخدم
 app.post("/getUserWorkout", getUserWorkout)
+
+// انهاء او تخطي تمرين
+app.post("/skipOrStartNewWorkout", skipOrStartNewWorkout)
 
 
 const PORT = process.env.PORT || 1337;
