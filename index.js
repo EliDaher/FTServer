@@ -119,6 +119,9 @@ app.get("/workout/:id", getWorkOut);
 // تعديل برنامج رياضي
 app.put("/workout/:id", updateWorkOut);
 
+// تعديل برنامج رياضي
+app.put("/deleteWorkout/:id", deleteWorkout);
+
 // تعديل البرنامج التدريبي للمستخدم
 app.post("/modifyUserWorkout", modifyUserWorkout);
 
