@@ -30,7 +30,7 @@ const {
     getWorkOut,
     updateWorkOut,
     getAllWorkOuts,
-    deleteWorkout
+    deleteWorkOut
     
 } = require('./controllers/workOut.controller')
 
@@ -121,7 +121,7 @@ app.get("/workout/:id", getWorkOut);
 app.put("/workout/:id", updateWorkOut);
 
 // تعديل برنامج رياضي
-app.put("/deleteWorkout/:id", deleteWorkout);
+app.put("/deleteWorkout/:id", deleteWorkOut);
 
 // تعديل البرنامج التدريبي للمستخدم
 app.post("/modifyUserWorkout", modifyUserWorkout);
