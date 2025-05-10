@@ -54,11 +54,11 @@ const io = new Server(server, {
 
 // السماح بالوصول من الشبكة المحلية
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+  origin: '*', // السماح لكل المواقع
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['*'] // السماح بكل الهيدرات
 }));
+
 
 app.use(express.json()); // لمعالجة بيانات JSON في الطلبات POST
 
