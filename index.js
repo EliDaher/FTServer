@@ -30,6 +30,7 @@ const {
     getWorkOut,
     updateWorkOut,
     getAllWorkOuts,
+    deleteWorkout
     
 } = require('./controllers/workOut.controller')
 
