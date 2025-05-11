@@ -25,7 +25,6 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-// دالة إنشاء تمرين
 const createExercise = async (req, res) => {
     upload.single('imageFile')(req, res, async function (err) {
         if (err instanceof multer.MulterError) {
@@ -43,13 +42,11 @@ const createExercise = async (req, res) => {
             commonMistakes
         } = req.body;
 
-        if (!req.file || !req.file.path) {
-            return res.status(400).json({ error: 'Image file is required.' });
-        }
+        // 🔄 استخدم صورة افتراضية إذا لم يتم رفع صورة
+        const imageUrl = req.file && req.file.path 
+            ? req.file.path 
+            : ''; // رابط صورة افتراضية مناسبة
 
-        const imageUrl = req.file.path; // رابط Cloudinary النهائي
-
-        // التحقق من وجود التمرين
         const ExerciseRef = ref(database, `exercise/${exerciseName}`);
         const snapshot = await get(ExerciseRef);
 
@@ -57,7 +54,6 @@ const createExercise = async (req, res) => {
             return res.status(400).json({ error: "Exercise already exists." });
         }
 
-        // الحفظ في قاعدة البيانات
         await set(ExerciseRef, {
             exerciseName,
             category,
@@ -92,7 +88,6 @@ const createExercise = async (req, res) => {
         });
     });
 };
-
 
 // دالة جلب كل التمارين
 const getAllExercises = async (req, res) => {
