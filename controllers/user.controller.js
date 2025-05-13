@@ -207,6 +207,7 @@ const getUserWorkout = async (req, res) => {
         }
       
         const userData = snapshot.val();
+        console.log(userData)
         const workouts = userData.workouts || [];
       
         if (workouts.length === 0) {
@@ -231,9 +232,10 @@ const getUserWorkout = async (req, res) => {
       
         const todayWorkout = workouts[newIndex];
         const workoutId = todayWorkout.id
-        const todayWorkoutRef = ref(database, `workouts/${workoutId}`);
+        const todayWorkoutRef = ref(database, `workOuts/${workoutId}`);
         const resSnapshot = await get(todayWorkoutRef) 
         const finalWorkout = resSnapshot.val();
+        console.log(finalWorkout)
       
         return res.status(200).json({ success: true, workout: finalWorkout });
   
