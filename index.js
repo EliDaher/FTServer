@@ -37,6 +37,9 @@ const {
 const {
     AddNutritionProgram,
     getAllNutritionPrograms,
+    getNutritionProgramById,
+    updateNutritionProgram,
+    deleteNutritionProgram,
 } = require('./controllers/nutritionPrograms.controller')
 
 
@@ -142,6 +145,15 @@ app.get("/getAllNutritionPrograms", getAllNutritionPrograms)
 
 //اضافة برنامج غذائي
 app.post("/AddNutritionProgram", AddNutritionProgram)
+
+//جلب برنامج غذائي محدد
+app.get("/getNutritionProgramById", getNutritionProgramById)
+
+//تعديل برنامج غذائي
+app.put("/updateNutritionProgram", updateNutritionProgram)
+
+//حزف برنامج غذائي
+app.delete("deleteNutritionProgram", deleteNutritionProgram)
 
 
 const PORT = process.env.PORT || 1337;
