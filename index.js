@@ -147,13 +147,13 @@ app.get("/getAllNutritionPrograms", getAllNutritionPrograms)
 app.post("/AddNutritionProgram", AddNutritionProgram)
 
 //جلب برنامج غذائي محدد
-app.get("/getNutritionProgramById", getNutritionProgramById)
+app.get("/getNutritionProgramById/:id", getNutritionProgramById)
 
 //تعديل برنامج غذائي
-app.put("/updateNutritionProgram", updateNutritionProgram)
+app.put("/updateNutritionProgram/:id", updateNutritionProgram)
 
 //حزف برنامج غذائي
-app.delete("deleteNutritionProgram", deleteNutritionProgram)
+app.delete("deleteNutritionProgram/:id", deleteNutritionProgram)
 
 
 const PORT = process.env.PORT || 1337;
