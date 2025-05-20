@@ -34,6 +34,11 @@ const {
     
 } = require('./controllers/workOut.controller')
 
+const {
+    AddNutritionProgram,
+    getAllNutritionPrograms,
+} = require('./controllers/nutritionPrograms.controller')
+
 
 
 
@@ -131,6 +136,12 @@ app.post("/getUserWorkout", getUserWorkout)
 
 // انهاء او تخطي تمرين
 app.post("/skipOrStartNewWorkout", skipOrStartNewWorkout)
+
+// اعادة كل البرامج الغذائية
+app.get("/getAllNutritionPrograms", getAllNutritionPrograms)
+
+//اضافة برنامج غذائي
+app.post("/AddNutritionProgram", AddNutritionProgram)
 
 
 const PORT = process.env.PORT || 1337;
