@@ -5,8 +5,7 @@ const { database } = require('../firebaseConfig.js');
 const AddNutritionProgram = async (req, res) => {
     try {
         const program = req.body;
-        const db = getDatabase();
-        const newRef = push(ref(db, "nutritionPrograms"));
+        const newRef = push(ref(database, "nutritionPrograms"));
 
         await set(newRef, {
           ...program,
