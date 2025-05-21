@@ -162,6 +162,24 @@ const getAllFullWorkout = async (req, res) => {
   }
 }
 
+// حزف برناج تدريبي 
+const deleteFullWorkout = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: "Workout ID is required." });
+    }
+
+    const workOutRef = ref(database, `fullWorkout/${id}`);
+    await remove(workOutRef);
+
+    return res.status(200).json({ success: true, message: "Workout deleted successfully." });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   addWorkOut,
   getAllWorkOuts,
@@ -169,4 +187,6 @@ module.exports = {
   updateWorkOut,
   deleteWorkOut,
   getAllFullWorkout,
+  deleteFullWorkout,
+  
 };

@@ -32,7 +32,9 @@ const {
     updateWorkOut,
     getAllWorkOuts,
     deleteWorkOut,
-    getAllFullWorkout
+    getAllFullWorkout,
+    deleteFullWorkout
+    
 } = require('./controllers/workOut.controller')
 
 const {
@@ -134,6 +136,9 @@ app.put("/workout/:id", updateWorkOut);
 
 // تعديل برنامج رياضي
 app.put("/deleteWorkout/:id", deleteWorkOut);
+
+//حزف برنامج تدريبي
+app.put("/deleteFullWorkout/:id", deleteFullWorkout);
 
 // تعديل البرنامج التدريبي للمستخدم
 app.post("/modifyUserWorkout", modifyUserWorkout);
