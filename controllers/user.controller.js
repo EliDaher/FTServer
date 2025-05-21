@@ -112,6 +112,40 @@ const updatePersonalDetails = async (req, res) => {
     }
 };
 
+
+// update personal details from the admin
+const adminUpdateUserDetails = async (req, res) => {
+    try {
+        const { username, job, fullname, bloodType, healthConditions, password, weight, height } = req.body;
+
+        if (!username || !fullname || !password ) {
+            return res.status(400).json({ error: "All fields are required." });
+        }
+
+        const UserRef = ref(database, `users/${username}`);
+        const snapshot = await get(UserRef);
+
+        if (!snapshot.exists()) {
+            return res.status(400).json({ error: "Username Didn't exists." });
+        }
+
+        await update(UserRef, {
+            username: username,
+            fullname: fullname,
+            password: password,
+            job: job || '',
+            bloodType: bloodType || '',
+            weight: weight || 0,
+            height: height || 0,
+            healthConditions: healthConditions || ''
+        });
+
+        return res.status(200).json({ success: true, message: "Data Updated Successfully." });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
 // get user data
 const getUserData = async (req, res) => {
     try {
@@ -310,6 +344,7 @@ module.exports = {
     getAllUsers,
     modifyUserWorkout,
     getUserWorkout,
-    skipOrStartNewWorkout
+    skipOrStartNewWorkout,
+    adminUpdateUserDetails
     
 };

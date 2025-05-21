@@ -15,7 +15,8 @@ const {
     updatePersonalDetails,
     modifyUserWorkout,
     getUserWorkout,
-    skipOrStartNewWorkout
+    skipOrStartNewWorkout,
+    adminUpdateUserDetails
 } = require('./controllers/user.controller')
 
 const { createExercise, 
@@ -109,6 +110,9 @@ app.post('/getUserData', getUserData);
 
 // تحديث بيانات المستخدم
 app.post('/updatePersonalDetails', updatePersonalDetails);
+
+// تحديث بيانات المستخدم
+app.post('/adminUpdateUserDetails', adminUpdateUserDetails);
 
 // تعديل التمرين
 app.post('/updateExercise', updateExercise);
