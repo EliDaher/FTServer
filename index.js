@@ -138,7 +138,7 @@ app.put("/workout/:id", updateWorkOut);
 app.put("/deleteWorkout/:id", deleteWorkOut);
 
 //حزف برنامج تدريبي
-app.put("/deleteFullWorkout/:id", deleteFullWorkout);
+app.delete("/deleteFullWorkout/:id", deleteFullWorkout);
 
 // تعديل البرنامج التدريبي للمستخدم
 app.post("/modifyUserWorkout", modifyUserWorkout);
