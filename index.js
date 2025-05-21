@@ -31,8 +31,8 @@ const {
     getWorkOut,
     updateWorkOut,
     getAllWorkOuts,
-    deleteWorkOut
-    
+    deleteWorkOut,
+    getAllFullWorkout
 } = require('./controllers/workOut.controller')
 
 const {
@@ -157,7 +157,10 @@ app.get("/getNutritionProgramById/:id", getNutritionProgramById)
 app.put("/updateNutritionProgram/:id", updateNutritionProgram)
 
 //حزف برنامج غذائي
-app.delete("deleteNutritionProgram/:id", deleteNutritionProgram)
+app.delete("/deleteNutritionProgram/:id", deleteNutritionProgram)
+
+// اعادة كل البرامج 
+app.get('/getAllFullWorkout', getAllFullWorkout)
 
 
 const PORT = process.env.PORT || 1337;

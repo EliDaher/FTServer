@@ -144,10 +144,29 @@ const deleteWorkOut = async (req, res) => {
   }
 };
 
+
+//اعادة البرامج التدريبية كاملة
+const getAllFullWorkout = async (req, res) => {
+  try {
+
+    const workOutRef = ref(database, `fullWorkout`);
+    const snapshot = await get(workOutRef);
+
+    if (!snapshot.exists()) {
+      return res.status(404).json({ error: "Workout not found." });
+    }
+
+    return res.status(200).json({ fullWorkouts: snapshot.val() });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   addWorkOut,
   getAllWorkOuts,
   getWorkOut,
   updateWorkOut,
   deleteWorkOut,
+  getAllFullWorkout,
 };
