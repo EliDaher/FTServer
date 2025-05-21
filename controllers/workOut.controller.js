@@ -6,27 +6,62 @@ const addWorkOut = async (req, res) => {
   try {
     const { newWorkOut } = req.body;
 
+    // تحقق من وجود البيانات الأساسية
     if (!newWorkOut || !newWorkOut.id || !newWorkOut.title) {
       return res.status(400).json({ error: "Workout data, id, and title are required." });
     }
+    if (!Array.isArray(newWorkOut.workouts)) {
+      return res.status(400).json({ error: "Workouts array is required." });
+    }
 
     const workoutId = newWorkOut.id;
-    const workOutRef = ref(database, `workOuts/${workoutId}`);
-    const snapshot = await get(workOutRef);
+    const fullWorkoutRef = ref(database, `fullWorkout/${workoutId}`);
+    const snapshot = await get(fullWorkoutRef);
 
     if (snapshot.exists()) {
       return res.status(400).json({ error: "Workout with this ID already exists." });
     }
 
-    const workoutData = {
+    // حذف "اليوم 0"
+    const filteredWorkouts = newWorkOut.workouts.filter(w => w.workoutName !== "اليوم 0");
+
+    // تحقق من صحة كل تمرين فرعي
+    for (const workoutObj of filteredWorkouts) {
+      if (!workoutObj.workout || !workoutObj.workout.id) {
+        return res.status(400).json({ error: "Each workout must contain a valid 'workout' object with an 'id'." });
+      }
+    }
+
+    // حفظ التمارين بشكل مستقل بشكل متوازٍ
+    await Promise.all(
+      filteredWorkouts.map(workoutObj => {
+        const workoutData = {
+          ...workoutObj.workout,
+          createdAt: workoutObj.workout.createdAt || new Date().toISOString(),
+        };
+        const singleWorkoutRef = ref(database, `workOuts/${workoutData.id}`);
+        return set(singleWorkoutRef, workoutData);
+      })
+    );
+
+    // تحضير نسخة لـ fullWorkout مع تحويل كل workout إلى ID فقط
+    const fullWorkoutData = {
       ...newWorkOut,
+      workouts: filteredWorkouts.map(w => w.workout.id),
       createdAt: newWorkOut.createdAt || new Date().toISOString(),
     };
 
-    await set(workOutRef, workoutData);
-    return res.status(200).json({ success: true, message: "Workout added successfully.", id: workoutId });
+    // حفظ النسخة المجمعة
+    await set(fullWorkoutRef, fullWorkoutData);
+
+    return res.status(200).json({
+      success: true,
+      message: "Workout added successfully.",
+      id: workoutId
+    });
 
   } catch (error) {
+    console.error("Error in addWorkOut:", error);
     return res.status(500).json({ error: error.message });
   }
 };
