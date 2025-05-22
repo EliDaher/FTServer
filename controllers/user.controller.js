@@ -341,7 +341,7 @@ const deleteUsername = async (req, res) => {
         return res.status(400).json({ error: "username is required." });
       }
   
-      const userRef = ref(database, `users/${name}`);
+      const userRef = ref(database, `users/${username}`);
       const snapshot = await get(userRef);
   
       if (!snapshot.exists()) {
