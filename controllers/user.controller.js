@@ -271,7 +271,7 @@ const getUserWorkout = async (req, res) => {
         const finalWorkout = resSnapshot.val();
         console.log(finalWorkout)
       
-        return res.status(200).json({ success: true, workout: finalWorkout });
+        return res.status(200).json({ success: true, workout: finalWorkout.workout });
   
     } catch (error) {
         return res.status(500).json({ error: error.message });
