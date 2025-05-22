@@ -1,4 +1,4 @@
-const { ref, update, get, set } = require("firebase/database");
+const { ref, update, get, set, remove } = require("firebase/database");
 const { database } = require('../firebaseConfig.js')
 
 
