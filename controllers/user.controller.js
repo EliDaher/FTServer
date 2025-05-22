@@ -265,7 +265,7 @@ const getUserWorkout = async (req, res) => {
         }
 
       
-        const todayWorkoutRef = ref(database, `fullWorkout/${userData.workouts[newIndex].id}`);
+        const todayWorkoutRef = ref(database, `fullWorkout/${userData.workouts[0].id}/workouts/${newIndex}`);
         const resSnapshot = await get(todayWorkoutRef) 
         console.log(resSnapshot)
         const finalWorkout = resSnapshot.val();
