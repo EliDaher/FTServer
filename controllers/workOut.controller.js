@@ -10,6 +10,7 @@ const addWorkOut = async (req, res) => {
     if (!newWorkOut || !newWorkOut.id || !newWorkOut.title) {
       return res.status(400).json({ error: "Workout data, id, and title are required." });
     }
+
     if (!Array.isArray(newWorkOut.workouts)) {
       return res.status(400).json({ error: "Workouts array is required." });
     }
@@ -22,37 +23,18 @@ const addWorkOut = async (req, res) => {
       return res.status(400).json({ error: "Workout with this ID already exists." });
     }
 
-    // حذف "اليوم 0"
+    // حذف "اليوم 0" فقط
     const filteredWorkouts = newWorkOut.workouts.filter(w => w.workoutName !== "اليوم 0");
 
-    // تحقق من صحة كل تمرين فرعي
-    for (const workoutObj of filteredWorkouts) {
-      if (!workoutObj.workout || !workoutObj.workout.id) {
-        return res.status(400).json({ error: "Each workout must contain a valid 'workout' object with an 'id'." });
-      }
-    }
-
-    // حفظ التمارين بشكل مستقل بشكل متوازٍ
-    await Promise.all(
-      filteredWorkouts.map(workoutObj => {
-        const workoutData = {
-          ...workoutObj.workout,
-          createdAt: workoutObj.workout.createdAt || new Date().toISOString(),
-        };
-        const singleWorkoutRef = ref(database, `workOuts/${workoutData.id}`);
-        return set(singleWorkoutRef, workoutData);
-      })
-    );
-
-    // تحضير نسخة لـ fullWorkout مع تحويل كل workout إلى ID فقط
-    const fullWorkoutData = {
+    // إنشاء نسخة جديدة من newWorkOut مع حذف اليوم 0
+    const cleanedWorkout = {
       ...newWorkOut,
-      workouts: filteredWorkouts.map(w => w.workout.id),
-      createdAt: newWorkOut.createdAt || new Date().toISOString(),
+      workouts: filteredWorkouts,
+      createdAt: newWorkOut.createdAt || new Date().toISOString()
     };
 
-    // حفظ النسخة المجمعة
-    await set(fullWorkoutRef, fullWorkoutData);
+    // حفظ الكائن كما هو
+    await set(fullWorkoutRef, cleanedWorkout);
 
     return res.status(200).json({
       success: true,
@@ -65,6 +47,7 @@ const addWorkOut = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 
 // Get All Workouts
 const getAllWorkOuts = async (req, res) => {
