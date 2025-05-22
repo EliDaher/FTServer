@@ -332,7 +332,30 @@ const skipOrStartNewWorkout = async (req, res) => {
     }
 };
   
+
+const deleteUsername = async (req, res) => {
+    try {
+      const { username } = req.body;
   
+      if (!username) {
+        return res.status(400).json({ error: "username is required." });
+      }
+  
+      const userRef = ref(database, `users/${name}`);
+      const snapshot = await get(userRef);
+  
+      if (!snapshot.exists()) {
+        return res.status(404).json({ error: "username does not exist." });
+      }
+  
+      await remove(userRef);
+  
+      return res.status(200).json({ success: true, message: "username deleted successfully." });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+};
+
 
 
 module.exports = { 
@@ -345,6 +368,7 @@ module.exports = {
     modifyUserWorkout,
     getUserWorkout,
     skipOrStartNewWorkout,
-    adminUpdateUserDetails
+    adminUpdateUserDetails,
+    deleteUsername
     
 };

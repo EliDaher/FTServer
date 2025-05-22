@@ -16,7 +16,8 @@ const {
     modifyUserWorkout,
     getUserWorkout,
     skipOrStartNewWorkout,
-    adminUpdateUserDetails
+    adminUpdateUserDetails,
+    deleteUsername
 } = require('./controllers/user.controller')
 
 const { createExercise, 
@@ -121,6 +122,9 @@ app.post('/updateExercise', updateExercise);
 
 // حذف التمرين
 app.post('/deleteExercise', deleteExercise);
+
+// حذف مستخدم
+app.post('/deleteUsername', deleteUsername);
 
 // اضافة برنامج تدريبي
 app.post("/addWorkOut", addWorkOut);
