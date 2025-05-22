@@ -263,6 +263,7 @@ const getUserWorkout = async (req, res) => {
             lastWorkoutDate: today
           });
         }
+        
       
         const todayWorkoutRef = ref(database, `fullWorkout/${userData.workouts[newIndex]}`);
         const resSnapshot = await get(todayWorkoutRef) 
