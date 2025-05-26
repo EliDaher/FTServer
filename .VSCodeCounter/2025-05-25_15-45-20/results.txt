@@ -1,0 +1,29 @@
+Date : 2025-05-25 15:45:20
+Directory : c:\Users\eeli5\Desktop\myProjects\Fitness\FTServer\controllers
+Total : 5 files,  641 codes, 47 comments, 196 blanks, all 884 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |          5 |        641 |         47 |        196 |        884 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                           | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                              |          5 |        641 |         47 |        196 |        884 |
++------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                       | language   | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\eeli5\Desktop\myProjects\Fitness\FTServer\controllers\auth.controller.js              | JavaScript |         46 |          2 |         15 |         63 |
+| c:\Users\eeli5\Desktop\myProjects\Fitness\FTServer\controllers\exercise.controller.js          | JavaScript |        139 |          6 |         36 |        181 |
+| c:\Users\eeli5\Desktop\myProjects\Fitness\FTServer\controllers\nutritionPrograms.controller.js | JavaScript |         72 |          5 |         15 |         92 |
+| c:\Users\eeli5\Desktop\myProjects\Fitness\FTServer\controllers\user.controller.js              | JavaScript |        259 |         23 |         90 |        372 |
+| c:\Users\eeli5\Desktop\myProjects\Fitness\FTServer\controllers\workOut.controller.js           | JavaScript |        125 |         11 |         40 |        176 |
+| Total                                                                                          |            |        641 |         47 |        196 |        884 |
++------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

@@ -17,7 +17,8 @@ const {
     getUserWorkout,
     skipOrStartNewWorkout,
     adminUpdateUserDetails,
-    deleteUsername
+    deleteUsername,
+    modifyUserNutrition
 } = require('./controllers/user.controller')
 
 const { createExercise, 
@@ -146,6 +147,9 @@ app.delete("/deleteFullWorkout/:id", deleteFullWorkout);
 
 // تعديل البرنامج التدريبي للمستخدم
 app.post("/modifyUserWorkout", modifyUserWorkout);
+
+//تعديل البرنامج الغذائي للمستخدم
+app.post("/modifyUserNutrition", modifyUserNutrition);
 
 // جلب تمارين المستخدم
 app.post("/getUserWorkout", getUserWorkout)

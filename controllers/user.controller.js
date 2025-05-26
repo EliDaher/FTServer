@@ -220,7 +220,34 @@ const modifyUserWorkout = async (req, res) => {
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
-  };
+};
+  
+
+const modifyUserNutrition = async (req, res) => {
+    try {
+      const { updatedNutrition, username } = req.body;
+  
+      if (!username || !updatedNutrition) {
+        return res.status(400).json({ error: "Username and update data are required." });
+      }
+  
+      const userRef = ref(database, `users/${username}`);
+      const snapshot = await get(userRef);
+  
+      // التأكد من وجود بيانات المستخدم
+      if (!snapshot.exists()) {
+        return res.status(404).json({ error: "User not found." });
+      }
+
+      // تحديث التمرين
+      const nutritionRef = ref(database, `users/${username}/nutrition`);
+      await set(nutritionRef, updatedNutrition);
+  
+      return res.status(200).json({ success: true, message: "Nutrition program updated successfully." });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+};
   
 
 
@@ -366,6 +393,7 @@ module.exports = {
     getUserWorkout,
     skipOrStartNewWorkout,
     adminUpdateUserDetails,
-    deleteUsername
+    deleteUsername,
+    modifyUserNutrition
     
 };
