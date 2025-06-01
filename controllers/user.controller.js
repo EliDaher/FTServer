@@ -308,6 +308,7 @@ const getUserWorkout = async (req, res) => {
 const skipOrStartNewWorkout = async (req, res) => {
     try {
         const { username } = req.body;
+        console.log(username)
         
         if (!username) {
           return res.status(400).json({ error: "Username is required." });
@@ -349,6 +350,7 @@ const skipOrStartNewWorkout = async (req, res) => {
         // إضافة إلى السجل (إن أردت)
       /*  const historyRef = ref(database, `users/${username}/history`);
         await push(historyRef, historyEntry);*/
+        console.log(newWorkout)
       
         return res.status(200).json({ success: true, workout: newWorkout });
     } catch (error) {
