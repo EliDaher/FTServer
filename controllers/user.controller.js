@@ -308,51 +308,49 @@ const getUserWorkout = async (req, res) => {
 const skipOrStartNewWorkout = async (req, res) => {
     try {
         const { username } = req.body;
-        console.log(username)
-        
+
         if (!username) {
-          return res.status(400).json({ error: "Username is required." });
+            return res.status(400).json({ error: "Username is required." });
         }
-      
+
         const userRef = ref(database, `users/${username}`);
         const snapshot = await get(userRef);
-      
+
         if (!snapshot.exists()) {
-          return res.status(404).json({ error: "User not found." });
+            return res.status(404).json({ error: "User not found." });
         }
-      
+
         const userData = snapshot.val();
-        const workouts = userData.workouts || [];
-      
-        if (workouts.length === 0) {
-          return res.status(200).json({ success: true, message: "No workouts found." });
-        }
-      
-        const currentIndex = userData.lastWorkoutIndex ?? -1;
-        const newIndex = (currentIndex + 1) % workouts.length;
         const today = new Date().toISOString().slice(0, 10);
-      
-        const newWorkout = workouts[newIndex];
-      
-        // (اختياري) سجل التمرين أو التخطي
-       /* const historyEntry = {
-          date: today,
-          action: "skipped or started",
-          workout: newWorkout,
-        };*/
-      
-        // تحديث البيانات
+
+        if (!userData.workouts || userData.workouts.length === 0) {
+            return res.status(200).json({ success: true, message: "No workouts assigned to user." });
+        }
+
+        const fullWorkoutId = userData.workouts[0].id;
+        const fullWorkoutRef = ref(database, `fullWorkout/${fullWorkoutId}/workouts`);
+        const fullWorkoutSnapshot = await get(fullWorkoutRef);
+
+        if (!fullWorkoutSnapshot.exists()) {
+            return res.status(404).json({ error: "Workout data not found in fullWorkout." });
+        }
+
+        const allWorkouts = fullWorkoutSnapshot.val();
+        const totalWorkouts = Object.keys(allWorkouts).length;
+
+        const currentIndex = userData.lastWorkoutIndex ?? -1;
+        const newIndex = (currentIndex + 1) % totalWorkouts;
+
         await update(userRef, {
-          lastWorkoutIndex: newIndex,
-          lastWorkoutDate: today,
+            lastWorkoutIndex: newIndex,
+            lastWorkoutDate: today,
         });
-      
-        // إضافة إلى السجل (إن أردت)
-      /*  const historyRef = ref(database, `users/${username}/history`);
-        await push(historyRef, historyEntry);*/
-        console.log(newWorkout)
-      
-        return res.status(200).json({ success: true, workout: newWorkout });
+
+        const workoutRef = ref(database, `fullWorkout/${fullWorkoutId}/workouts/${newIndex}`);
+        const workoutSnapshot = await get(workoutRef);
+        const workout = workoutSnapshot.val();
+
+        return res.status(200).json({ success: true, workout: workout?.workout || workout });
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
