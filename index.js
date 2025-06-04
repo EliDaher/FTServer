@@ -45,7 +45,8 @@ const {
     getNutritionProgramById,
     updateNutritionProgram,
     deleteNutritionProgram,
-} = require('./controllers/nutritionPrograms.controller')
+} = require('./controllers/nutritionPrograms.controller');
+const { addSets, getSets } = require('./controllers/sets.controller');
 
 
 
@@ -174,6 +175,12 @@ app.delete("/deleteNutritionProgram/:id", deleteNutritionProgram)
 
 // اعادة كل البرامج 
 app.get('/getAllFullWorkout', getAllFullWorkout)
+
+//اضافة جلسات
+app.post('/addSets', addSets)
+
+//حزف جلسات
+app.get('/getSets', getSets)
 
 
 const PORT = process.env.PORT || 1337;
