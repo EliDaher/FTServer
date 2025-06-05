@@ -37,7 +37,6 @@ const createExercise = async (req, res) => {
             exerciseName,
             category,
             bodyPart,
-            difficulty,
             description,
             commonMistakes
         } = req.body;
@@ -58,17 +57,6 @@ const createExercise = async (req, res) => {
             exerciseName,
             category,
             bodyPart,
-            difficulty,
-            description,
-            commonMistakes,
-            imageUrl
-        });
-
-        console.log('تم استلام التمرين:', {
-            exerciseName,
-            category,
-            bodyPart,
-            difficulty,
             description,
             commonMistakes,
             imageUrl
@@ -80,7 +68,6 @@ const createExercise = async (req, res) => {
                 exerciseName,
                 category,
                 bodyPart,
-                difficulty,
                 description,
                 commonMistakes,
                 imageUrl

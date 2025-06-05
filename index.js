@@ -47,6 +47,7 @@ const {
     deleteNutritionProgram,
 } = require('./controllers/nutritionPrograms.controller');
 const { addSets, getSets } = require('./controllers/sets.controller');
+const { getCategories, addCategory } = require('./controllers/category.controller');
 
 
 
@@ -181,6 +182,13 @@ app.post('/addSets', addSets)
 
 //حزف جلسات
 app.get('/getSets', getSets)
+
+//جلب صنف التمارين
+app.get("/exerciseCategories", getCategories);
+
+// اضافة صنف تمرين
+app.post("/AddExerciseCategories", addCategory);
+
 
 
 const PORT = process.env.PORT || 1337;
