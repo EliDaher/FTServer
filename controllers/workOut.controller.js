@@ -165,7 +165,7 @@ const deleteFullWorkout = async (req, res) => {
 
 const getWorkoutCategories = async (req, res) => {
   try {
-    const snapshot = await get(child(ref(db), 'categories/workout'));
+    const snapshot = await get(child(ref(database), 'categories/workout'));
 
     if (snapshot.exists()) {
       const data = snapshot.val();
@@ -188,7 +188,7 @@ const addWorkoutCategory = async (req, res) => {
       return res.status(400).json({ message: "Category name is required" });
     }
 
-    const categoryRef = ref(db, 'categories/workout');
+    const categoryRef = ref(database, 'categories/workout');
 
     await update(categoryRef, {
       [categoryName]: true
