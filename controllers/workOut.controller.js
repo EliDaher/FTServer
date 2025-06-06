@@ -1,4 +1,4 @@
-const { ref, set, get, update, remove } = require("firebase/database");
+const { ref, set, get, update, remove, child } = require("firebase/database");
 const { database } = require('../firebaseConfig.js');
 
 // Add Workout
