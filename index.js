@@ -35,8 +35,9 @@ const {
     getAllWorkOuts,
     deleteWorkOut,
     getAllFullWorkout,
-    deleteFullWorkout
-    
+    deleteFullWorkout,
+    getWorkoutCategories,
+    addWorkoutCategory
 } = require('./controllers/workOut.controller')
 
 const {
@@ -188,6 +189,12 @@ app.get("/exerciseCategories", getCategories);
 
 // اضافة صنف تمرين
 app.post("/AddExerciseCategories", addCategory);
+
+//جلب صنف التمارين
+app.get("/workoutCategories", getWorkoutCategories);
+
+// اضافة صنف تمرين
+app.post("/AddWorkoutCategories", addWorkoutCategory);
 
 
 
