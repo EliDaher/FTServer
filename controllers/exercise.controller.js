@@ -1,4 +1,4 @@
-const { ref, set, get, update, remove } = require("firebase/database");
+const { ref, set, get, update, remove, push } = require("firebase/database");
 const { database } = require('../firebaseConfig.js');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -46,20 +46,17 @@ const createExercise = async (req, res) => {
             ? req.file.path 
             : ''; // رابط صورة افتراضية مناسبة
 
-        const ExerciseRef = ref(database, `exercise/${exerciseName}`);
-        const snapshot = await get(ExerciseRef);
+        const ExerciseRef = ref(database, 'exercise');
+        const newExerciseRef = await push(ExerciseRef); // أنشئ مرجعًا فريدًا جديدًا
 
-        if (snapshot.exists()) {
-            return res.status(400).json({ error: "Exercise already exists." });
-        }
-
-        await set(ExerciseRef, {
+        await set(newExerciseRef, {
             exerciseName,
             category,
             bodyPart,
             description,
             commonMistakes,
-            imageUrl
+            imageUrl,
+            id: newExerciseRef.key
         });
 
         return res.status(201).json({
@@ -73,6 +70,7 @@ const createExercise = async (req, res) => {
                 imageUrl
             }
         });
+
     });
 };
 
