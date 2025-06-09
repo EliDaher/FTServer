@@ -4,9 +4,9 @@ const { database } = require('../firebaseConfig.js');
 // Sign Up
 const SignUp = async (req, res) => {
     try {
-        const { email, password, username, fullname } = req.body;
+        const { number, password, username, fullname } = req.body;
 
-        if (!email || !password || !username || !fullname) {
+        if (!number || !password || !username || !fullname) {
             return res.status(400).json({ error: "All fields are required." });
         }
 
@@ -21,7 +21,7 @@ const SignUp = async (req, res) => {
             fullname,
             username,
             password, // لاحقاً سنشفره!
-            email,
+            number,
         });
 
         return res.status(200).json({ success: true, message: "User created successfully." });
