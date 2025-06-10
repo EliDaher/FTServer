@@ -37,7 +37,8 @@ const {
     getAllFullWorkout,
     deleteFullWorkout,
     getWorkoutCategories,
-    addWorkoutCategory
+    addWorkoutCategory,
+    getFullWorkoutById
 } = require('./controllers/workOut.controller')
 
 const {
@@ -138,6 +139,9 @@ app.post("/getAllWorkOuts", getAllWorkOuts);
 
 // اعادة برنامج تدريبي محدد
 app.get("/workout/:id", getWorkOut);
+
+// اعادة برنامج تدريبي محدد
+app.get("/workout/:id", getFullWorkoutById);
 
 // تعديل برنامج رياضي
 app.put("/workout/:id", updateWorkOut);

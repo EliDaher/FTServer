@@ -200,6 +200,27 @@ const addWorkoutCategory = async (req, res) => {
   }
 };
 
+const getFullWorkoutById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: "Workout ID is required." });
+    }
+
+    const workOutRef = ref(database, `fullWorkout/${id}`);
+    const snapshot = await get(workOutRef);
+
+    if (!snapshot.exists()) {
+      return res.status(404).json({ error: "Workout not found." });
+    }
+
+    return res.status(200).json({ success: true, workout: snapshot.val() });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 
 module.exports = {
   addWorkOut,
@@ -210,6 +231,7 @@ module.exports = {
   getAllFullWorkout,
   deleteFullWorkout,
   addWorkoutCategory,
-  getWorkoutCategories
+  getWorkoutCategories,
+  getFullWorkoutById,
   
 };
