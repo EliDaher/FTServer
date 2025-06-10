@@ -141,7 +141,7 @@ app.post("/getAllWorkOuts", getAllWorkOuts);
 app.get("/workout/:id", getWorkOut);
 
 // اعادة برنامج تدريبي محدد
-app.get("/workout/:id", getFullWorkoutById);
+app.get("/getFullWorkoutById/:id", getFullWorkoutById);
 
 // تعديل برنامج رياضي
 app.put("/workout/:id", updateWorkOut);
