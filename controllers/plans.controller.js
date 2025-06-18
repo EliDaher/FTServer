@@ -8,7 +8,7 @@ const {
 const { database } = require("../firebaseConfig.js");
 
 // 🔹 GET /plans — جلب جميع الخطط
-export const getAllPlans = async (_, res) => {
+const getAllPlans = async (_, res) => {
   try {
     const snapshot = await get(ref(database, "subscriptionPlans"));
     const plans = snapshot.val() || {};
@@ -19,7 +19,7 @@ export const getAllPlans = async (_, res) => {
 };
 
 // 🔹 POST /plans — إنشاء خطة جديدة
-export const createPlan = async (req, res) => {
+const createPlan = async (req, res) => {
   try {
     const { key, name, durationDays, price, description } = req.body;
 
@@ -41,7 +41,7 @@ export const createPlan = async (req, res) => {
 };
 
 // 🔹 PUT /plans/:key — تعديل خطة
-export const updatePlan = async (req, res) => {
+const updatePlan = async (req, res) => {
   try {
     const { key } = req.params;
     const { name, durationDays, price, description } = req.body;
@@ -60,7 +60,7 @@ export const updatePlan = async (req, res) => {
 };
 
 // 🔹 DELETE /plans/:key — حذف خطة
-export const deletePlan = async (req, res) => {
+const deletePlan = async (req, res) => {
   try {
     const { key } = req.params;
     await remove(ref(database, `subscriptionPlans/${key}`));
@@ -69,3 +69,10 @@ export const deletePlan = async (req, res) => {
     return res.status(500).json({ message: "خطأ أثناء الحذف", error });
   }
 };
+
+module.exports = {
+    getAllPlans,
+    createPlan,
+    updatePlan,
+    deletePlan,
+}
