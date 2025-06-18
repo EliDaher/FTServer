@@ -50,6 +50,8 @@ const {
 } = require('./controllers/nutritionPrograms.controller');
 const { addSets, getSets } = require('./controllers/sets.controller');
 const { getCategories, addCategory } = require('./controllers/category.controller');
+const { createSubscription, getAllSubscriptions, getSubscriptionsByUser, addPayment, deleteSubscription, getUserDueAmount } = require('./controllers/subscrptions.controller');
+const { getAllPlans, createPlan, updatePlan, deletePlan } = require('./controllers/plans.controller');
 
 
 
@@ -200,6 +202,17 @@ app.get("/workoutCategories", getWorkoutCategories);
 // اضافة صنف تمرين
 app.post("/AddWorkoutCategories", addWorkoutCategory);
 
+app.post("/createSubscription", createSubscription);
+app.get("/getAllSubscriptions", getAllSubscriptions);
+app.get("/getSubscriptionsByUser/:userId", getSubscriptionsByUser);
+app.post("/addPayment/:subId/payments", addPayment);
+app.delete("/deleteSubscription/:subId", deleteSubscription);
+app.get("/getUserDueAmount/:userId", getUserDueAmount);
+
+app.get("/getAllPlans", getAllPlans);
+app.post("/createPlan", createPlan);
+app.put("/updatePlan/:key", updatePlan);
+app.delete("/deletePlan/:key", deletePlan);
 
 
 const PORT = process.env.PORT || 1337;
