@@ -1,11 +1,11 @@
-import {
+const {
   ref,
-  get,
   set,
+  get,
   update,
-  remove
-} from "firebase/database";
-import { database } from "../firebaseConfig"; // تأكد من الاسم الصحيح
+  remove,
+} = require("firebase/database");
+const { database } = require("../firebaseConfig.js");
 
 // 🔹 GET /plans — جلب جميع الخطط
 export const getAllPlans = async (_, res) => {
