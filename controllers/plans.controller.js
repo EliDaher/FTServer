@@ -21,14 +21,14 @@ const getAllPlans = async (_, res) => {
 // 🔹 POST /plans — إنشاء خطة جديدة
 const createPlan = async (req, res) => {
   try {
-    const { key, name, durationDays, price, description } = req.body;
+    const { key, name, duration, price, description } = req.body;
 
-    if (!key || !name || !durationDays || !price)
+    if (!key || !name || !duration || !price)
       return res.status(400).json({ message: "الحقول المطلوبة ناقصة" });
 
     const planData = {
       name,
-      durationDays,
+      duration,
       price,
       description: description || ""
     };
@@ -44,11 +44,11 @@ const createPlan = async (req, res) => {
 const updatePlan = async (req, res) => {
   try {
     const { key } = req.params;
-    const { name, durationDays, price, description } = req.body;
+    const { name, duration, price, description } = req.body;
 
     const updates = {};
     if (name) updates.name = name;
-    if (durationDays) updates.durationDays = durationDays;
+    if (duration) updates.duration = duration;
     if (price) updates.price = price;
     if (description !== undefined) updates.description = description;
 
