@@ -1,6 +1,15 @@
-import { Request, Response } from "express";
-import { db } from "../firebase";
-import { v4 as uuidv4 } from "uuid";
+const {
+  ref,
+  set,
+  get,
+  update,
+  remove,
+  query,
+  orderByChild,
+  equalTo
+} = require("firebase/database");
+const { database } = require("../firebaseConfig.js");
+const { v4: uuidv4 } = require("uuid");
 
 // Helper to calculate end date
 function calculateEndDate(start, days) {
@@ -10,14 +19,14 @@ function calculateEndDate(start, days) {
 }
 
 // POST /subscriptions
-export const createSubscription = async (req, res) => {
+const createSubscription = async (req, res) => {
   try {
     const { userId, planKey } = req.body;
     if (!userId || !planKey) return res.status(400).send("Missing data");
 
-    const plansSnap = await db.ref("subscriptionPlans").once("value");
+    const plansSnap = await get(ref(database, "subscriptionPlans"));
     const plans = plansSnap.val();
-    const plan = plans[planKey];
+    const plan = plans?.[planKey];
 
     if (!plan) return res.status(400).send("Invalid plan");
 
@@ -37,19 +46,20 @@ export const createSubscription = async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    await db.ref(`subscriptions/${subId}`).set(newSub);
-    await db.ref(`users/${userId}/currentSubscriptionId`).set(subId);
+    await set(ref(database, `subscriptions/${subId}`), newSub);
+    await set(ref(database, `users/${userId}/currentSubscriptionId`), subId);
 
     return res.status(201).json({ id: subId, ...newSub });
   } catch (err) {
+    console.error(err);
     return res.status(500).send("Error creating subscription");
   }
 };
 
 // GET /subscriptions
-export const getAllSubscriptions = async (_, res) => {
+const getAllSubscriptions = async (_, res) => {
   try {
-    const snapshot = await db.ref("subscriptions").once("value");
+    const snapshot = await get(ref(database, "subscriptions"));
     return res.status(200).json(snapshot.val() || {});
   } catch (err) {
     return res.status(500).send("Error fetching subscriptions");
@@ -57,10 +67,12 @@ export const getAllSubscriptions = async (_, res) => {
 };
 
 // GET /subscriptions/user/:userId
-export const getSubscriptionsByUser = async (req, res) => {
+const getSubscriptionsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const snapshot = await db.ref("subscriptions").orderByChild("userId").equalTo(userId).once("value");
+    const snapshot = await get(
+      query(ref(database, "subscriptions"), orderByChild("userId"), equalTo(userId))
+    );
     return res.status(200).json(snapshot.val() || {});
   } catch (err) {
     return res.status(500).send("Error fetching user subscriptions");
@@ -68,18 +80,19 @@ export const getSubscriptionsByUser = async (req, res) => {
 };
 
 // POST /subscriptions/:subId/payments
-export const addPayment = async (req, res) => {
+const addPayment = async (req, res) => {
   try {
     const { subId } = req.params;
     const { amount, method, note } = req.body;
 
     if (!amount || !method) return res.status(400).send("Missing payment data");
 
-    const subRef = db.ref(`subscriptions/${subId}`);
-    const subSnap = await subRef.once("value");
+    const subSnap = await get(ref(database, `subscriptions/${subId}`));
     if (!subSnap.exists()) return res.status(404).send("Subscription not found");
 
+    const subscription = subSnap.val();
     const paymentId = uuidv4();
+
     const payment = {
       paymentDate: new Date().toISOString().slice(0, 10),
       amount,
@@ -88,48 +101,45 @@ export const addPayment = async (req, res) => {
     };
 
     // Add payment
-    await db.ref(`payments/${subId}/${paymentId}`).set(payment);
+    await set(ref(database, `payments/${subId}/${paymentId}`), payment);
 
-    // Update subscription status
-    const subscription = subSnap.val();
+    // Update subscription
     const newAmountPaid = (subscription.amountPaid || 0) + amount;
     let status = "partial";
     if (newAmountPaid >= subscription.amount) status = "paid";
     else if (newAmountPaid === 0) status = "unpaid";
 
-    await subRef.update({
+    await update(ref(database, `subscriptions/${subId}`), {
       amountPaid: newAmountPaid,
       paymentStatus: status
     });
 
     return res.status(200).json({ success: true, payment });
   } catch (err) {
+    console.error(err);
     return res.status(500).send("Error adding payment");
   }
 };
 
 // DELETE /subscriptions/:subId
-export const deleteSubscription = async (req, res) => {
+const deleteSubscription = async (req, res) => {
   try {
     const { subId } = req.params;
-    await db.ref(`subscriptions/${subId}`).remove();
-    await db.ref(`payments/${subId}`).remove();
+    await remove(ref(database, `subscriptions/${subId}`));
+    await remove(ref(database, `payments/${subId}`));
     return res.status(200).send("Subscription deleted");
   } catch (err) {
     return res.status(500).send("Error deleting subscription");
   }
 };
 
-
-export const getUserDueAmount = async (req, res) => {
+// GET /subscriptions/due/:userId
+const getUserDueAmount = async (req, res) => {
   const { userId } = req.params;
   try {
-    const snapshot = await db
-      .ref("subscriptions")
-      .orderByChild("userId")
-      .equalTo(userId)
-      .once("value");
-
+    const snapshot = await get(
+      query(ref(database, "subscriptions"), orderByChild("userId"), equalTo(userId))
+    );
     const subs = snapshot.val();
     if (!subs) return res.status(404).send("لا يوجد اشتراكات");
 
@@ -146,4 +156,14 @@ export const getUserDueAmount = async (req, res) => {
   } catch (error) {
     return res.status(500).send("خطأ أثناء الحساب");
   }
+};
+
+// Exports
+module.exports = {
+  createSubscription,
+  getAllSubscriptions,
+  getSubscriptionsByUser,
+  addPayment,
+  deleteSubscription,
+  getUserDueAmount
 };

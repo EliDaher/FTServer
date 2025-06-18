@@ -1,10 +1,16 @@
-import { Request, Response } from "express";
-import { db } from "../firebase";
+import {
+  ref,
+  get,
+  set,
+  update,
+  remove
+} from "firebase/database";
+import { database } from "../firebaseConfig"; // تأكد من الاسم الصحيح
 
 // 🔹 GET /plans — جلب جميع الخطط
 export const getAllPlans = async (_, res) => {
   try {
-    const snapshot = await db.ref("subscriptionPlans").once("value");
+    const snapshot = await get(ref(database, "subscriptionPlans"));
     const plans = snapshot.val() || {};
     return res.status(200).json(plans);
   } catch (error) {
@@ -27,7 +33,7 @@ export const createPlan = async (req, res) => {
       description: description || ""
     };
 
-    await db.ref(`subscriptionPlans/${key}`).set(planData);
+    await set(ref(database, `subscriptionPlans/${key}`), planData);
     return res.status(201).json({ message: "تم إنشاء الخطة", plan: planData });
   } catch (error) {
     return res.status(500).json({ message: "خطأ أثناء إنشاء الخطة", error });
@@ -46,7 +52,7 @@ export const updatePlan = async (req, res) => {
     if (price) updates.price = price;
     if (description !== undefined) updates.description = description;
 
-    await db.ref(`subscriptionPlans/${key}`).update(updates);
+    await update(ref(database, `subscriptionPlans/${key}`), updates);
     return res.status(200).json({ message: "تم التعديل", updates });
   } catch (error) {
     return res.status(500).json({ message: "خطأ أثناء التعديل", error });
@@ -57,7 +63,7 @@ export const updatePlan = async (req, res) => {
 export const deletePlan = async (req, res) => {
   try {
     const { key } = req.params;
-    await db.ref(`subscriptionPlans/${key}`).remove();
+    await remove(ref(database, `subscriptionPlans/${key}`));
     return res.status(200).json({ message: "تم حذف الخطة" });
   } catch (error) {
     return res.status(500).json({ message: "خطأ أثناء الحذف", error });
