@@ -2,220 +2,169 @@ const express = require('express');
 const { google } = require('googleapis');
 const cors = require('cors');
 const http = require('http');
-require('dotenv').config(); // تحميل متغيرات البيئة
+require('dotenv').config();
 const { Server } = require("socket.io");
 const cron = require("node-cron");
-const { Login, SignUp } = require('./controllers/auth.controller')
-const { 
-    getAllUsers,
-    addWeight, 
-    addHeight, 
-    addGender, 
-    getUserData, 
-    updatePersonalDetails,
-    modifyUserWorkout,
-    getUserWorkout,
-    skipOrStartNewWorkout,
-    adminUpdateUserDetails,
-    deleteUsername,
-    modifyUserNutrition
-} = require('./controllers/user.controller')
 
-const { createExercise, 
-    getAllExercises, 
-    getExerciseByName, 
-    updateExercise, 
-    deleteExercise 
+const { Login, SignUp } = require('./controllers/auth.controller');
+const {
+  getAllUsers,
+  addWeight,
+  addHeight,
+  addGender,
+  getUserData,
+  updatePersonalDetails,
+  modifyUserWorkout,
+  getUserWorkout,
+  skipOrStartNewWorkout,
+  adminUpdateUserDetails,
+  deleteUsername,
+  modifyUserNutrition,
+} = require('./controllers/user.controller');
+
+const {
+  createExercise,
+  getAllExercises,
+  getExerciseByName,
+  updateExercise,
+  deleteExercise,
 } = require('./controllers/exercise.controller');
 
 const {
-    addWorkOut,
-    getWorkOut,
-    updateWorkOut,
-    getAllWorkOuts,
-    deleteWorkOut,
-    getAllFullWorkout,
-    deleteFullWorkout,
-    getWorkoutCategories,
-    addWorkoutCategory,
-    getFullWorkoutById
-} = require('./controllers/workOut.controller')
+  addWorkOut,
+  getWorkOut,
+  updateWorkOut,
+  getAllWorkOuts,
+  deleteWorkOut,
+  getAllFullWorkout,
+  deleteFullWorkout,
+  getWorkoutCategories,
+  addWorkoutCategory,
+  getFullWorkoutById,
+} = require('./controllers/workOut.controller');
 
 const {
-    AddNutritionProgram,
-    getAllNutritionPrograms,
-    getNutritionProgramById,
-    updateNutritionProgram,
-    deleteNutritionProgram,
+  AddNutritionProgram,
+  getAllNutritionPrograms,
+  getNutritionProgramById,
+  updateNutritionProgram,
+  deleteNutritionProgram,
 } = require('./controllers/nutritionPrograms.controller');
+
 const { addSets, getSets } = require('./controllers/sets.controller');
 const { getCategories, addCategory } = require('./controllers/category.controller');
-const { createSubscription, getAllSubscriptions, getSubscriptionsByUser, addPayment, deleteSubscription, getUserDueAmount } = require('./controllers/subscrptions.controller');
+const {
+  createSubscription,
+  getAllSubscriptions,
+  getSubscriptionsByUser,
+  addPayment,
+  getSubscriptionPayments,
+  renewSubscription,
+  deleteSubscription,
+  getUserDueAmount,
+  getUserBillingSummary,
+  getAllBillingSummary,
+  runDailyCycleGeneration,
+} = require('./controllers/subscrptions.controller');
 const { getAllPlans, createPlan, updatePlan, deletePlan } = require('./controllers/plans.controller');
-
-
-
-
-
+const { attachRequestUser, requireAdmin, requireSelfOrAdmin } = require('./controllers/accountingAuth');
 
 const app = express();
 
-const server = http.createServer(app); // Create HTTP server
+const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true
-    }
-});
-
-
-// السماح بالوصول من الشبكة المحلية
-app.use(cors({
+  cors: {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-}));
-
-app.use(express.json()); // لمعالجة بيانات JSON في الطلبات POST
-
-
-
-
-
-app.get("/", (req, res) => {
-    res.send("Server is alive!");
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id', 'x-user', 'x-username'],
+    credentials: true,
+  },
 });
 
-app.post("/SignUp", SignUp);  
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id', 'x-user', 'x-username'],
+  credentials: true,
+}));
 
-app.post("/login", Login);  
+app.use(express.json());
 
-app.post("/addWeight", addWeight);  
+app.get('/', (_, res) => {
+  res.send('Server is alive!');
+});
 
-app.post("/addHeight", addHeight); 
+app.post('/SignUp', SignUp);
+app.post('/login', Login);
 
-app.post("/addGender", addGender);    
+app.post('/addWeight', addWeight);
+app.post('/addHeight', addHeight);
+app.post('/addGender', addGender);
+app.get('/getAllUsers', getAllUsers);
 
-
-//اعادة كل المستخدمين
-app.get(`/getAllUsers`, getAllUsers)
-
-// تقديم الصور
 app.use('/assets', express.static('assets'));
 
-// نقطة الإدخال
 app.post('/api/exercises', createExercise);
-
-// اعادة كل التمارين
 app.post('/getAllExercises', getAllExercises);
-
-// اعادة تمرين حسب اسمه
 app.get('/getExerciseByName', getExerciseByName);
 
-// اعادة بيانات المشترك
 app.post('/getUserData', getUserData);
-
-// تحديث بيانات المستخدم
 app.post('/updatePersonalDetails', updatePersonalDetails);
-
-// تحديث بيانات المستخدم
 app.post('/adminUpdateUserDetails', adminUpdateUserDetails);
 
-// تعديل التمرين
 app.post('/updateExercise', updateExercise);
-
-// حذف التمرين
 app.post('/deleteExercise', deleteExercise);
-
-// حذف مستخدم
 app.post('/deleteUsername', deleteUsername);
 
-// اضافة برنامج تدريبي
-app.post("/addWorkOut", addWorkOut);
+app.post('/addWorkOut', addWorkOut);
+app.post('/getAllWorkOuts', getAllWorkOuts);
+app.get('/workout/:id', getWorkOut);
+app.get('/getFullWorkoutById/:id', getFullWorkoutById);
+app.put('/workout/:id', updateWorkOut);
+app.put('/deleteWorkout/:id', deleteWorkOut);
+app.delete('/deleteFullWorkout/:id', deleteFullWorkout);
+app.get('/getAllFullWorkout', getAllFullWorkout);
 
-// اعادة كل التمارين
-app.post("/getAllWorkOuts", getAllWorkOuts);
+app.post('/modifyUserWorkout', modifyUserWorkout);
+app.post('/modifyUserNutrition', modifyUserNutrition);
+app.post('/getUserWorkout', getUserWorkout);
+app.post('/skipOrStartNewWorkout', skipOrStartNewWorkout);
 
-// اعادة برنامج تدريبي محدد
-app.get("/workout/:id", getWorkOut);
+app.get('/getAllNutritionPrograms', getAllNutritionPrograms);
+app.post('/AddNutritionProgram', AddNutritionProgram);
+app.get('/getNutritionProgramById/:id', getNutritionProgramById);
+app.put('/updateNutritionProgram/:id', updateNutritionProgram);
+app.delete('/deleteNutritionProgram/:id', deleteNutritionProgram);
 
-// اعادة برنامج تدريبي محدد
-app.get("/getFullWorkoutById/:id", getFullWorkoutById);
+app.post('/addSets', addSets);
+app.get('/getSets', getSets);
 
-// تعديل برنامج رياضي
-app.put("/workout/:id", updateWorkOut);
+app.get('/exerciseCategories', getCategories);
+app.post('/AddExerciseCategories', addCategory);
+app.get('/workoutCategories', getWorkoutCategories);
+app.post('/AddWorkoutCategories', addWorkoutCategory);
 
-// تعديل برنامج رياضي
-app.put("/deleteWorkout/:id", deleteWorkOut);
+app.get('/getAllPlans', attachRequestUser, requireAdmin, getAllPlans);
+app.post('/createPlan', attachRequestUser, requireAdmin, createPlan);
+app.put('/updatePlan/:key', attachRequestUser, requireAdmin, updatePlan);
+app.delete('/deletePlan/:key', attachRequestUser, requireAdmin, deletePlan);
 
-//حزف برنامج تدريبي
-app.delete("/deleteFullWorkout/:id", deleteFullWorkout);
+app.post('/createSubscription', attachRequestUser, requireAdmin, createSubscription);
+app.get('/getAllSubscriptions', attachRequestUser, requireAdmin, getAllSubscriptions);
+app.get('/getAllBillingSummary', attachRequestUser, requireAdmin, getAllBillingSummary);
+app.get('/getSubscriptionsByUser/:userId', attachRequestUser, requireSelfOrAdmin('userId'), getSubscriptionsByUser);
+app.get('/getUserDueAmount/:userId', attachRequestUser, requireSelfOrAdmin('userId'), getUserDueAmount);
+app.get('/getUserBillingSummary/:userId', attachRequestUser, requireSelfOrAdmin('userId'), getUserBillingSummary);
+app.get('/getSubscriptionPayments/:subId', attachRequestUser, getSubscriptionPayments);
+app.post('/addPayment/:subId/payments', attachRequestUser, requireAdmin, addPayment);
+app.post('/renewSubscription/:subId', attachRequestUser, requireAdmin, renewSubscription);
+app.delete('/deleteSubscription/:subId', attachRequestUser, requireAdmin, deleteSubscription);
 
-// تعديل البرنامج التدريبي للمستخدم
-app.post("/modifyUserWorkout", modifyUserWorkout);
-
-//تعديل البرنامج الغذائي للمستخدم
-app.post("/modifyUserNutrition", modifyUserNutrition);
-
-// جلب تمارين المستخدم
-app.post("/getUserWorkout", getUserWorkout)
-
-// انهاء او تخطي تمرين
-app.post("/skipOrStartNewWorkout", skipOrStartNewWorkout)
-
-// اعادة كل البرامج الغذائية
-app.get("/getAllNutritionPrograms", getAllNutritionPrograms)
-
-//اضافة برنامج غذائي
-app.post("/AddNutritionProgram", AddNutritionProgram)
-
-//جلب برنامج غذائي محدد
-app.get("/getNutritionProgramById/:id", getNutritionProgramById)
-
-//تعديل برنامج غذائي
-app.put("/updateNutritionProgram/:id", updateNutritionProgram)
-
-//حزف برنامج غذائي
-app.delete("/deleteNutritionProgram/:id", deleteNutritionProgram)
-
-// اعادة كل البرامج 
-app.get('/getAllFullWorkout', getAllFullWorkout)
-
-//اضافة جلسات
-app.post('/addSets', addSets)
-
-//حزف جلسات
-app.get('/getSets', getSets)
-
-//جلب صنف التمارين
-app.get("/exerciseCategories", getCategories);
-
-// اضافة صنف تمرين
-app.post("/AddExerciseCategories", addCategory);
-
-//جلب صنف التمارين
-app.get("/workoutCategories", getWorkoutCategories);
-
-// اضافة صنف تمرين
-app.post("/AddWorkoutCategories", addWorkoutCategory);
-
-app.post("/createSubscription", createSubscription);
-app.get("/getAllSubscriptions", getAllSubscriptions);
-app.get("/getSubscriptionsByUser/:userId", getSubscriptionsByUser);
-app.post("/addPayment/:subId/payments", addPayment);
-app.delete("/deleteSubscription/:subId", deleteSubscription);
-app.get("/getUserDueAmount/:userId", getUserDueAmount);
-
-app.get("/getAllPlans", getAllPlans);
-app.post("/createPlan", createPlan);
-app.put("/updatePlan/:key", updatePlan);
-app.delete("/deletePlan/:key", deletePlan);
-
+cron.schedule('0 2 * * *', async () => {
+  await runDailyCycleGeneration();
+});
 
 const PORT = process.env.PORT || 1337;
 server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

@@ -1,78 +1,97 @@
-const {
-  ref,
-  set,
-  get,
-  update,
-  remove,
-} = require("firebase/database");
+const { ref, set, get, update, remove } = require("firebase/database");
 const { database } = require("../firebaseConfig.js");
 
-// 🔹 GET /plans — جلب جميع الخطط
+const normalizeCurrency = (currency) => {
+  if (typeof currency !== "string") return "SYP";
+  const value = currency.trim().toUpperCase();
+  return value || "SYP";
+};
+
+const normalizePlan = (plan = {}, key = "") => ({
+  key,
+  name: plan.name || key,
+  duration: Number(plan.duration || 0),
+  price: Number(plan.price || 0),
+  description: plan.description || "",
+  currency: normalizeCurrency(plan.currency),
+});
+
 const getAllPlans = async (_, res) => {
   try {
     const snapshot = await get(ref(database, "subscriptionPlans"));
-    const plans = snapshot.val() || {};
-    return res.status(200).json(plans);
+    const rawPlans = snapshot.val() || {};
+
+    const normalizedPlans = Object.entries(rawPlans).reduce((acc, [key, value]) => {
+      acc[key] = normalizePlan(value, key);
+      return acc;
+    }, {});
+
+    return res.status(200).json(normalizedPlans);
   } catch (error) {
-    return res.status(500).json({ message: "خطأ أثناء جلب الخطط", error });
+    return res.status(500).json({ message: "??? ????? ??? ?????", error: error.message });
   }
 };
 
-// 🔹 POST /plans — إنشاء خطة جديدة
 const createPlan = async (req, res) => {
   try {
-    const { key, name, duration, price, description } = req.body;
+    const { key, name, duration, price, description, currency } = req.body;
 
-    if (!key || !name || !duration || !price)
-      return res.status(400).json({ message: "الحقول المطلوبة ناقصة" });
+    if (!key || !name || duration === undefined || price === undefined) {
+      return res.status(400).json({ message: "?????? ???????? ?????" });
+    }
 
-    const planData = {
-      name,
-      duration,
-      price,
-      description: description || ""
-    };
-
+    const planData = normalizePlan({ name, duration, price, description, currency }, key);
     await set(ref(database, `subscriptionPlans/${key}`), planData);
-    return res.status(201).json({ message: "تم إنشاء الخطة", plan: planData });
+
+    return res.status(201).json({ message: "?? ????? ?????", plan: planData });
   } catch (error) {
-    return res.status(500).json({ message: "خطأ أثناء إنشاء الخطة", error });
+    return res.status(500).json({ message: "??? ????? ????? ?????", error: error.message });
   }
 };
 
-// 🔹 PUT /plans/:key — تعديل خطة
 const updatePlan = async (req, res) => {
   try {
     const { key } = req.params;
-    const { name, duration, price, description } = req.body;
+    const { name, duration, price, description, currency } = req.body;
 
-    const updates = {};
-    if (name) updates.name = name;
-    if (duration) updates.duration = duration;
-    if (price) updates.price = price;
-    if (description !== undefined) updates.description = description;
+    const existingSnapshot = await get(ref(database, `subscriptionPlans/${key}`));
+    if (!existingSnapshot.exists()) {
+      return res.status(404).json({ message: "????? ??? ??????" });
+    }
 
-    await update(ref(database, `subscriptionPlans/${key}`), updates);
-    return res.status(200).json({ message: "تم التعديل", updates });
+    const current = normalizePlan(existingSnapshot.val(), key);
+    const nextPlan = normalizePlan(
+      {
+        ...current,
+        name: name ?? current.name,
+        duration: duration ?? current.duration,
+        price: price ?? current.price,
+        description: description ?? current.description,
+        currency: currency ?? current.currency,
+      },
+      key
+    );
+
+    await update(ref(database, `subscriptionPlans/${key}`), nextPlan);
+    return res.status(200).json({ message: "?? ???????", plan: nextPlan });
   } catch (error) {
-    return res.status(500).json({ message: "خطأ أثناء التعديل", error });
+    return res.status(500).json({ message: "??? ????? ???????", error: error.message });
   }
 };
 
-// 🔹 DELETE /plans/:key — حذف خطة
 const deletePlan = async (req, res) => {
   try {
     const { key } = req.params;
     await remove(ref(database, `subscriptionPlans/${key}`));
-    return res.status(200).json({ message: "تم حذف الخطة" });
+    return res.status(200).json({ message: "?? ??? ?????" });
   } catch (error) {
-    return res.status(500).json({ message: "خطأ أثناء الحذف", error });
+    return res.status(500).json({ message: "??? ????? ?????", error: error.message });
   }
 };
 
 module.exports = {
-    getAllPlans,
-    createPlan,
-    updatePlan,
-    deletePlan,
-}
+  getAllPlans,
+  createPlan,
+  updatePlan,
+  deletePlan,
+};

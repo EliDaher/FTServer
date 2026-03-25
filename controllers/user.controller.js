@@ -81,6 +81,34 @@ const addWeight = async (req, res) => {
     }
 };
 
+// add new weight change to hestory
+const changeWeight = async (req, res) => {
+    try {
+        const { username, weight } = req.body;
+
+        if (!username || !weight) {
+            return res.status(400).json({ error: "All fields are required." });
+        }
+        const today = new Date().toISOString().slice(0, 10); // تاريخ اليوم بصيغة yyyy-mm-dd
+
+        const UserRef = ref(database, `users/${username}/weightHistory`);
+        const snapshot = await get(UserRef);
+
+        if (!snapshot.exists()) {
+            return res.status(400).json({ error: "Username Didn't exists." });
+        }
+
+        await update(UserRef, {
+            weight: weight,
+            time: today
+        });
+
+        return res.status(200).json({ success: true, message: "Weight Added successfully." });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
 // update personal details
 const updatePersonalDetails = async (req, res) => {
     try {
