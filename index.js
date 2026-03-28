@@ -74,6 +74,7 @@ const {
   addInventoryMovement,
   getInventoryMovements,
   getInventorySummary,
+  getInventoryAccountingSummary,
 } = require('./controllers/inventory.controller');
 const { attachRequestUser, requireAdmin, requireSelfOrAdmin } = require('./controllers/accountingAuth');
 
@@ -174,6 +175,7 @@ app.put('/updateInventoryItem/:itemId', attachRequestUser, requireAdmin, updateI
 app.post('/addInventoryMovement/:itemId/movements', attachRequestUser, requireAdmin, addInventoryMovement);
 app.get('/getInventoryMovements/:itemId', attachRequestUser, requireAdmin, getInventoryMovements);
 app.get('/getInventorySummary', attachRequestUser, requireAdmin, getInventorySummary);
+app.get('/getInventoryAccountingSummary', attachRequestUser, requireAdmin, getInventoryAccountingSummary);
 
 cron.schedule('0 2 * * *', async () => {
   await runDailyCycleGeneration();
@@ -183,4 +185,5 @@ const PORT = process.env.PORT || 1337;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
 
