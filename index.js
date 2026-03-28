@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const { google } = require('googleapis');
 const cors = require('cors');
 const http = require('http');
@@ -67,6 +67,14 @@ const {
   runDailyCycleGeneration,
 } = require('./controllers/subscrptions.controller');
 const { getAllPlans, createPlan, updatePlan, deletePlan } = require('./controllers/plans.controller');
+const {
+  getInventoryItems,
+  createInventoryItem,
+  updateInventoryItem,
+  addInventoryMovement,
+  getInventoryMovements,
+  getInventorySummary,
+} = require('./controllers/inventory.controller');
 const { attachRequestUser, requireAdmin, requireSelfOrAdmin } = require('./controllers/accountingAuth');
 
 const app = express();
@@ -160,6 +168,13 @@ app.post('/addPayment/:subId/payments', attachRequestUser, requireAdmin, addPaym
 app.post('/renewSubscription/:subId', attachRequestUser, requireAdmin, renewSubscription);
 app.delete('/deleteSubscription/:subId', attachRequestUser, requireAdmin, deleteSubscription);
 
+app.get('/getInventoryItems', attachRequestUser, requireAdmin, getInventoryItems);
+app.post('/createInventoryItem', attachRequestUser, requireAdmin, createInventoryItem);
+app.put('/updateInventoryItem/:itemId', attachRequestUser, requireAdmin, updateInventoryItem);
+app.post('/addInventoryMovement/:itemId/movements', attachRequestUser, requireAdmin, addInventoryMovement);
+app.get('/getInventoryMovements/:itemId', attachRequestUser, requireAdmin, getInventoryMovements);
+app.get('/getInventorySummary', attachRequestUser, requireAdmin, getInventorySummary);
+
 cron.schedule('0 2 * * *', async () => {
   await runDailyCycleGeneration();
 });
@@ -168,3 +183,4 @@ const PORT = process.env.PORT || 1337;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
