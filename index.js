@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const { google } = require('googleapis');
 const cors = require('cors');
 const http = require('http');
@@ -76,6 +76,7 @@ const {
   getInventorySummary,
   getInventoryAccountingSummary,
 } = require('./controllers/inventory.controller');
+const { getProjectBalanceReport } = require('./controllers/balance.controller');
 const { attachRequestUser, requireAdmin, requireSelfOrAdmin } = require('./controllers/accountingAuth');
 
 const app = express();
@@ -176,6 +177,7 @@ app.post('/addInventoryMovement/:itemId/movements', attachRequestUser, requireAd
 app.get('/getInventoryMovements/:itemId', attachRequestUser, requireAdmin, getInventoryMovements);
 app.get('/getInventorySummary', attachRequestUser, requireAdmin, getInventorySummary);
 app.get('/getInventoryAccountingSummary', attachRequestUser, requireAdmin, getInventoryAccountingSummary);
+app.get('/getProjectBalanceReport', attachRequestUser, requireAdmin, getProjectBalanceReport);
 
 cron.schedule('0 2 * * *', async () => {
   await runDailyCycleGeneration();
@@ -185,5 +187,6 @@ const PORT = process.env.PORT || 1337;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
 
 
