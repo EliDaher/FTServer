@@ -120,6 +120,9 @@ const resolveMovementDateKey = (movement) => {
 
 const createCurrencyBucket = () => ({
   todayIncome: 0,
+  todayCashIn: 0,
+  todayCashOut: 0,
+  todayNet: 0,
   cashIn: 0,
   cashOut: 0,
   currentBalance: 0,
@@ -173,9 +176,15 @@ const finalizeKpis = (kpisMap) => {
   Object.entries(kpisMap).forEach(([currency, value]) => {
     const currentBalance = value.cashIn - value.cashOut;
     const periodGrossProfit = value.periodRevenue - value.periodCogs;
+    const todayCashIn = roundAmount(value.todayCashIn);
+    const todayCashOut = roundAmount(value.todayCashOut);
+    const todayNet = roundAmount(todayCashIn - todayCashOut);
 
     output[currency] = {
       todayIncome: roundAmount(value.todayIncome),
+      todayCashIn,
+      todayCashOut,
+      todayNet,
       cashIn: roundAmount(value.cashIn),
       cashOut: roundAmount(value.cashOut),
       currentBalance: roundAmount(currentBalance),
@@ -291,11 +300,14 @@ const getProjectBalanceReport = async (req, res) => {
 
         if (dateKey === todayKey) {
           bucket.todayIncome += amount;
+          bucket.todayCashIn += amount;
           todayTransactions.push({
             id: payment.id || `${subId}-${dateKey}-${amount}`,
             type: "subscription_payment",
+            direction: "in",
             currency,
             amount: roundAmount(amount),
+            signedAmount: roundAmount(amount),
             referenceId: subId,
             method: normalizeString(payment.method),
             note: normalizeString(payment.note),
@@ -344,11 +356,31 @@ const getProjectBalanceReport = async (req, res) => {
 
         if (dateKey === todayKey && saleRevenue > 0) {
           bucket.todayIncome += saleRevenue;
+          bucket.todayCashIn += saleRevenue;
           todayTransactions.push({
             id: movement.id || `${itemId}-${dateKey}-${saleRevenue}`,
             type: "inventory_sale",
+            direction: "in",
             currency,
             amount: roundAmount(saleRevenue),
+            signedAmount: roundAmount(saleRevenue),
+            referenceId: itemId,
+            method: "inventory",
+            note: normalizeString(movement.note || movement.reason),
+            date: dateKey,
+            createdAt: movement.createdAt || `${dateKey}T00:00:00.000Z`,
+          });
+        }
+
+        if (dateKey === todayKey && purchaseValue > 0) {
+          bucket.todayCashOut += purchaseValue;
+          todayTransactions.push({
+            id: movement.id || `${itemId}-${dateKey}-${purchaseValue}`,
+            type: "inventory_purchase",
+            direction: "out",
+            currency,
+            amount: roundAmount(purchaseValue),
+            signedAmount: roundAmount(0 - purchaseValue),
             referenceId: itemId,
             method: "inventory",
             note: normalizeString(movement.note || movement.reason),
@@ -434,3 +466,4 @@ const getProjectBalanceReport = async (req, res) => {
 module.exports = {
   getProjectBalanceReport,
 };
+
