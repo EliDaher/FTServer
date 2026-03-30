@@ -1,4 +1,4 @@
-﻿const { randomUUID } = require("crypto");
+const { randomUUID } = require("crypto");
 const { ref, get, set, update } = require("firebase/database");
 const { database } = require("../firebaseConfig.js");
 
@@ -302,7 +302,52 @@ const createInventoryItem = async (req, res) => {
       itemId
     );
 
-    await set(ref(database, `${ITEM_ROOT}/${itemId}`), item);
+    const initialQuantity = roundAmount(quantityOnHand);
+    const rootRef = ref(database);
+
+    if (initialQuantity > 0) {
+      const movementId = randomUUID();
+      const initialCost = roundAmount(avgUnitCost);
+      const purchaseAmount = roundAmount(initialQuantity * initialCost);
+
+      const initialMovement = normalizeMovement(
+        {
+          id: movementId,
+          itemId,
+          type: "in",
+          movementClass: "purchase",
+          quantity: initialQuantity,
+          unitCost: initialCost,
+          unitSalePrice: null,
+          reason: "opening_stock",
+          note: "Initial stock created with item",
+          currency: item.currency,
+          balanceBefore: 0,
+          balanceAfter: initialQuantity,
+          stockValueBefore: 0,
+          stockValueAfter: item.stockValue,
+          avgCostBefore: 0,
+          avgCostAfter: avgUnitCost,
+          purchaseAmount,
+          cogsAmount: 0,
+          revenueAmount: 0,
+          grossProfit: 0,
+          linkedUserId: null,
+          linkedSubscriptionId: null,
+          createdBy: req.userId,
+          createdAt: now,
+        },
+        item
+      );
+
+      await update(rootRef, {
+        [`${ITEM_ROOT}/${itemId}`]: item,
+        [`${MOVEMENT_ROOT}/${itemId}/${movementId}`]: initialMovement,
+      });
+    } else {
+      await set(ref(database, `${ITEM_ROOT}/${itemId}`), item);
+    }
+
     return res.status(201).json({ item: decorateItem(item) });
   } catch (error) {
     console.error("createInventoryItem failed:", error);
@@ -735,3 +780,4 @@ module.exports = {
   getInventorySummary,
   getInventoryAccountingSummary,
 };
+
